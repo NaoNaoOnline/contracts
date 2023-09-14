@@ -5,36 +5,36 @@ import { ethers } from "hardhat";
 
 describe("SchemaRegistry", function () {
   async function deployRegistry() {
-    const [signer] = await ethers.getSigners();
+    const sig = await ethers.getSigners();
 
     const fac = await ethers.getContractFactory("SchemaRegistry");
     const con = await fac.deploy();
     const add = await con.getAddress();
 
-    const schemaRegistry = new SchemaRegistry(add);
-    schemaRegistry.connect(signer);
+    const reg = new SchemaRegistry(add);
+    reg.connect(sig[0]);
 
-    return { schemaRegistry };
+    return { reg };
   }
 
   async function registerSchema() {
-    const { schemaRegistry } = await loadFixture(deployRegistry);
+    const { reg } = await loadFixture(deployRegistry);
 
-    const tnx = await schemaRegistry.register({
+    const tnx = await reg.register({
       schema: "bytes32 schemaId,string name", // NAME A SCHEME
       revocable: true,
     });
 
     const uid = await tnx.wait();
 
-    return { schemaRegistry, uid };
+    return { reg, uid };
   }
 
   describe("deployment", function () {
     it("should yield registry version", async function () {
-      const { schemaRegistry } = await loadFixture(deployRegistry);
+      const { reg } = await loadFixture(deployRegistry);
 
-      expect(await schemaRegistry.getVersion()).to.equal("1.2.0");
+      expect(await reg.getVersion()).to.equal("1.2.0");
     });
   });
 
@@ -46,9 +46,9 @@ describe("SchemaRegistry", function () {
     });
 
     it("should get schema", async function () {
-      const { schemaRegistry, uid } = await loadFixture(registerSchema);
+      const { reg, uid } = await loadFixture(registerSchema);
 
-      const rec = await schemaRegistry.getSchema({ uid: uid });
+      const rec = await reg.getSchema({ uid: uid });
 
       expect(rec.resolver).to.equal("0x0000000000000000000000000000000000000000");
       expect(rec.revocable).to.equal(true);
