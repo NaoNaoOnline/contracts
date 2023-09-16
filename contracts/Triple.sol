@@ -72,14 +72,41 @@ library Triple {
 
     /// @notice TODO
     function _deleteRecord(States storage sta, Record memory rec) internal {
-        sta.reclis[sta.recind[rec.sys][rec.mem]] = sta.reclis[
-            sta.reclis.length - 1
-        ];
+        // The last element within the record list is moved to the position of
+        // the record that we are going to remove.
+        Record memory las = sta.reclis[sta.reclis.length - 1];
+
+        // The index of the record we want to remove within the record list
+        // represents the position the last record is moving into.
+        uint256 ind = sta.recind[rec.sys][rec.mem];
+
+        // The old index of the last element is set to the new position. This is
+        // the position of the element we are removing. From this point forward
+        // this position is occupied by the updated last element, which will not
+        // be the last element anymore after the process.
+        sta.recind[las.sys][las.mem] = ind;
+
+        // The last and now moved element overwrites the record we are tasked to
+        // delete.
+        sta.reclis[ind] = las;
+
+        // Popping the last element out of the record list is now safe because
+        // the last element did already move to its new location. That is the
+        // index of the element we were tasked to delete.
         sta.reclis.pop();
 
+        // We cleanup the index reference of the record that got deleted.
         delete sta.recind[rec.sys][rec.mem];
 
+        // We reduce the member count of the system from which we removed a
+        // member.
         sta.memcnt[rec.sys] -= 1;
+
+        // If the last member got deleted from a system we can cleanup the
+        // system's count reference.
+        if (sta.memcnt[rec.sys] == 0) {
+            delete sta.memcnt[rec.sys];
+        }
     }
 
     ///
@@ -124,9 +151,20 @@ library Triple {
     }
 
     /// @notice TODO
+    /// @notice Must be used with _existsSystem.
+    /// @notice Returns 0 if system does not exist.
+    function _searchMember(
+        States storage sta,
+        uint256 sys
+    ) internal view returns (uint256) {
+        return sta.memcnt[sys];
+    }
+
+    /// @notice TODO
     function _searchRecord(
         States storage sta
     ) internal view returns (Record[] memory) {
+        // TODO support chunking
         return sta.reclis;
     }
 }

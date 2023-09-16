@@ -115,14 +115,18 @@ contract Policy {
 
         // Adding a new member to an existing system.
         //
-        //     The system to be created must already exist.
+        //     The system to add the member to must exist.
+        //     The member to add must not already exist in that system.
         //     The caller must be in that system.
         //     The caller must have equal or higher access.
+        //     The caller must not add themselves.
         //
         if (
             _states._existsSystem(rec.sys) &&
+            !_states._existsMember(rec.sys, rec.mem) &&
             _states._existsMember(rec.sys, msg.sender) &&
-            _states._searchAccess(rec.sys, msg.sender) <= rec.acc
+            _states._searchAccess(rec.sys, msg.sender) <= rec.acc &&
+            rec.mem != msg.sender
         ) {
             return true;
         }
@@ -133,10 +137,62 @@ contract Policy {
     function _verifyDelete(
         Triple.Record memory rec
     ) internal view returns (bool) {
-        // TODO differentiate remove members from an existing system
-        // TODO differentiate delete an empty system
-        // TODO define conditions for success and return true
+        // Removing a member from an existing system (1).
+        //
+        //     The record to remove must exist as given.
+        //     The caller must not have access zero in system zero.
+        //     The caller must remove themselves.
+        //
+        if (
+            _states._existsRecord(rec) &&
+            !_states._existsRecord(
+                Triple.Record({sys: 0, mem: msg.sender, acc: 0})
+            ) &&
+            rec.mem == msg.sender
+        ) {
+            return true;
+        }
 
-        return true;
+        // Removing a member from an existing system (2).
+        //
+        //     The system to remove the member from must exist.
+        //     The member to remove must exist in that system.
+        //     The caller must have access zero in system zero.
+        //     The caller must not remove themselves.
+        //
+        if (
+            _states._existsSystem(rec.sys) &&
+            _states._existsMember(rec.sys, rec.mem) &&
+            _states._existsRecord(
+                Triple.Record({sys: 0, mem: msg.sender, acc: 0})
+            ) &&
+            rec.mem != msg.sender
+        ) {
+            return true;
+        }
+
+        // Removing a member from an existing system (3).
+        //
+        //     The system to remove the member from must exist.
+        //     The member to remove must exist in that system.
+        //     The caller must have access zero in system zero.
+        //     The caller must be the last member in that system.
+        //     The system to remove the member from must not be system zero.
+        //     The caller must remove themselves.
+        //
+        if (
+            _states._existsSystem(rec.sys) &&
+            _states._existsMember(rec.sys, rec.mem) &&
+            _states._existsRecord(
+                Triple.Record({sys: 0, mem: msg.sender, acc: 0})
+            ) &&
+            _states._searchMember(rec.sys) == 1 &&
+            rec.sys != 0 &&
+            rec.mem == msg.sender
+        ) {
+            return true;
+        }
+
+        return false;
     }
 }
