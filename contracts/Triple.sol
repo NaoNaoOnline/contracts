@@ -55,6 +55,16 @@ library Triple {
         //     }
         //
         mapping(uint256 => uint256) memcnt;
+        //
+        //     acccnt[sys][acc] = len(acc)
+        //
+        //     {
+        //         0: {0: 1, 1: 1},
+        //         1: {0: 1},
+        //         2: {0: 1, 1: 1}
+        //     }
+        //
+        mapping(uint256 => mapping(uint256 => uint256)) acccnt;
     }
 
     ///
@@ -68,6 +78,8 @@ library Triple {
         sta.recind[rec.sys][rec.mem] = sta.reclis.length - 1;
 
         sta.memcnt[rec.sys] += 1;
+
+        sta.acccnt[rec.sys][rec.acc] += 1;
     }
 
     /// @notice TODO
@@ -103,9 +115,19 @@ library Triple {
         sta.memcnt[rec.sys] -= 1;
 
         // If the last member got deleted from a system we can cleanup the
-        // system's count reference.
+        // system's member count reference.
         if (sta.memcnt[rec.sys] == 0) {
             delete sta.memcnt[rec.sys];
+        }
+
+        // We reduce the access count for the system from which we removed a
+        // member.
+        sta.acccnt[rec.sys][rec.acc] -= 1;
+
+        // If the last member got deleted from a system we can cleanup the
+        // system's access count reference.
+        if (sta.acccnt[rec.sys][rec.acc] == 0) {
+            delete sta.acccnt[rec.sys][rec.acc];
         }
     }
 
@@ -148,6 +170,17 @@ library Triple {
     ) internal view returns (uint256) {
         Record memory exi = sta.reclis[sta.recind[sys][mem]];
         return exi.acc;
+    }
+
+    /// @notice TODO
+    /// @notice Must be used with _existsSystem.
+    /// @notice Returns 0 if system does not exist.
+    function _searchAccess(
+        States storage sta,
+        uint256 sys,
+        uint256 acc
+    ) internal view returns (uint256) {
+        return sta.acccnt[sys][acc];
     }
 
     /// @notice TODO
