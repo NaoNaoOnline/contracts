@@ -189,6 +189,12 @@ contract Policy {
         // msg.caller might be gaining access zero.
         bool chp = _states._searchAccess(rec.sys, msg.sender) <= rec.acc;
 
+        // maz, multiple access zero, expresses whether the given system to
+        // remove the given member from has multiple access zero members. Must
+        // be used together with dse (does system exist). Otherwise an empty
+        // member count for the given access will be used.
+        bool maz = _states._searchAccess(rec.sys, 0) > 1;
+
         // oom, only one member, expresses whether the given system has only one
         // member.
         bool oom = _states._searchMember(rec.sys) == 1;
@@ -229,7 +235,8 @@ contract Policy {
             return true;
         }
 
-        // Access zero in system zero can remove themselves.
+        // Access zero in system zero can remove themselves from any system that
+        // is not system zero.
         //
         //     The record to remove must exist as given.
         //     The system to remove the member from must exist.
@@ -240,6 +247,20 @@ contract Policy {
         //     The caller must remove themselves.
         //
         if (dre && dse && dme && czz && oom && rec.sys != 0 && cim) {
+            return true;
+        }
+
+        // Access zero in system zero can remove themselves from system
+        // zero.
+        //
+        //     The record to remove must exist as given.
+        //     The system to remove the member from must exist.
+        //     The member to remove must exist in that system.
+        //     The caller must have access zero in system zero.
+        //     The system must have many access zero members.
+        //     The system to remove the member from must be system zero.
+        //
+        if (dre && dse && dme && czz && maz && rec.sys == 0) {
             return true;
         }
 
