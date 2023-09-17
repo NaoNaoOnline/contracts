@@ -6,9 +6,9 @@ contextual permission records, enforcing flat organizational structures without
 any capability of inheritance.
 
 ```Solidity
-@notice System refers to context, resource or scope.
-@notice Member refers to account, identity or user.
-@notice Access refers to level, permission or role.
+/// @notice System refers to context, resource or scope.
+/// @notice Member refers to account, identity or user.
+/// @notice Access refers to level, permission or role.
 ```
 
 SMAs are a form of access control lists or role based access control models. In
