@@ -2,7 +2,6 @@
 pragma solidity 0.8.21;
 
 import "./Triple.sol";
-import "hardhat/console.sol";
 
 /// @title Policy Management
 /// @author xh3b4sd
