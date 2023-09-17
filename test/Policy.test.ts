@@ -2,12 +2,6 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-// TODO test that when you are access zero and there are another members without access zero that you cannot remove yourself
-
-// TODO test that when you are access zero and there is another access zero that you can remove yourself
-//      test for system not zero
-// TODO test that when you are access zero and there is another access zero that they can remove you
-//      test for system not zero
 describe("Policy", () => {
   const deployContract = async () => {
     const sig = await ethers.getSigners();
@@ -18,6 +12,24 @@ describe("Policy", () => {
   }
 
   describe("deployment", () => {
+    describe("should emit event", () => {
+      describe("Created", () => {
+        it("sys: 0, mem: 0, acc: 0", async () => {
+          const { sig, pcn } = await loadFixture(deployContract);
+          await expect(pcn.deploymentTransaction()).to.emit(pcn, "Created").withArgs(0, sig[0].address, 0);
+        });
+      });
+    });
+
+    describe("should not emit event", () => {
+      describe("Deleted", () => {
+        it("sys: 0, mem: 0, acc: 0", async () => {
+          const { pcn } = await loadFixture(deployContract);
+          await expect(pcn.deploymentTransaction()).not.to.emit(pcn, "Deleted");
+        });
+      });
+    });
+
     it("should result in one record", async () => {
       const { pcn } = await loadFixture(deployContract);
       expect(await pcn.searchRecord()).to.have.length(1);
@@ -56,10 +68,29 @@ describe("Policy", () => {
         const createRecord = async () => {
           const { sig, pcn } = await loadFixture(deployContract);
 
-          await pcn.connect(sig[0]).createRecord({ sys: 0, mem: sig[1].address, acc: 0 })
+          const tnx = pcn.connect(sig[0]).createRecord({ sys: 0, mem: sig[1].address, acc: 0 })
+          await tnx;
 
-          return { sig, pcn };
+          return { sig, pcn, tnx };
         }
+
+        describe("should emit event", () => {
+          describe("Created", () => {
+            it("sys: 0, mem: 1, acc: 0", async () => {
+              const { sig, pcn, tnx } = await loadFixture(createRecord);
+              await expect(tnx).to.emit(pcn, "Created").withArgs(0, sig[1].address, 0);
+            });
+          });
+        });
+
+        describe("should not emit event", () => {
+          describe("Deleted", () => {
+            it("sys: 0, mem: 1, acc: 0", async () => {
+              const { pcn, tnx } = await loadFixture(createRecord);
+              await expect(tnx).not.to.emit(pcn, "Deleted");
+            });
+          });
+        });
 
         it("should result in two records", async () => {
           const { pcn } = await loadFixture(createRecord);
@@ -91,10 +122,29 @@ describe("Policy", () => {
             const deleteRecord = async () => {
               const { sig, pcn } = await loadFixture(createRecord);
 
-              await pcn.connect(sig[0]).deleteRecord({ sys: 0, mem: sig[1].address, acc: 0 })
+              const tnx = pcn.connect(sig[0]).deleteRecord({ sys: 0, mem: sig[1].address, acc: 0 })
+              await tnx;
 
-              return { sig, pcn };
+              return { sig, pcn, tnx };
             }
+
+            describe("should not emit event", () => {
+              describe("Created", () => {
+                it("sys: 0, mem: 1, acc: 0", async () => {
+                  const { pcn, tnx } = await loadFixture(deleteRecord);
+                  await expect(tnx).not.to.emit(pcn, "Created");
+                });
+              });
+            });
+
+            describe("should emit event", () => {
+              describe("Deleted", () => {
+                it("sys: 0, mem: 1, acc: 0", async () => {
+                  const { sig, pcn, tnx } = await loadFixture(deleteRecord);
+                  await expect(tnx).to.emit(pcn, "Deleted").withArgs(0, sig[1].address, 0);;
+                });
+              });
+            });
 
             it("should result in one record", async () => {
               const { pcn } = await loadFixture(deleteRecord);
@@ -177,14 +227,6 @@ describe("Policy", () => {
           return { sig, pcn };
         }
 
-        const deleteRecord = async () => {
-          const { sig, pcn } = await loadFixture(createRecord);
-
-          await pcn.connect(sig[0]).deleteRecord({ sys: 0, mem: sig[1].address, acc: 1 })
-
-          return { sig, pcn };
-        }
-
         it("should result in two records", async () => {
           const { pcn } = await loadFixture(createRecord);
           expect(await pcn.searchRecord()).to.have.length(2);
@@ -212,18 +254,28 @@ describe("Policy", () => {
 
         describe("delete", () => {
           describe("sys: 0, mem: 1, acc: 1", () => {
-            it("should result in one record", async () => {
-              const { pcn } = await loadFixture(deleteRecord);
-              expect(await pcn.searchRecord()).to.have.length(1);
-            });
+            const deleteRecord = async () => {
+              const { sig, pcn } = await loadFixture(createRecord);
 
-            describe("record one", () => {
-              it("sys: 0, mem: 0, acc: 0", async () => {
-                const { sig, pcn } = await loadFixture(deleteRecord);
+              await pcn.connect(sig[0]).deleteRecord({ sys: 0, mem: sig[1].address, acc: 1 })
 
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              return { sig, pcn };
+            }
+
+            describe("sys: 0, mem: 1, acc: 1", () => {
+              it("should result in one record", async () => {
+                const { pcn } = await loadFixture(deleteRecord);
+                expect(await pcn.searchRecord()).to.have.length(1);
+              });
+
+              describe("record one", () => {
+                it("sys: 0, mem: 0, acc: 0", async () => {
+                  const { sig, pcn } = await loadFixture(deleteRecord);
+
+                  expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                  expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+                  expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                });
               });
             });
           });
@@ -235,14 +287,6 @@ describe("Policy", () => {
           const { sig, pcn } = await loadFixture(deployContract);
 
           await pcn.connect(sig[0]).createRecord({ sys: 1, mem: sig[0].address, acc: 0 })
-
-          return { sig, pcn };
-        }
-
-        const deleteRecord = async () => {
-          const { sig, pcn } = await loadFixture(createRecord);
-
-          await pcn.connect(sig[0]).deleteRecord({ sys: 1, mem: sig[0].address, acc: 0 })
 
           return { sig, pcn };
         }
@@ -274,18 +318,28 @@ describe("Policy", () => {
 
         describe("delete", () => {
           describe("sys: 1, mem: 0, acc: 0", () => {
-            it("should result in one record", async () => {
-              const { pcn } = await loadFixture(deleteRecord);
-              expect(await pcn.searchRecord()).to.have.length(1);
-            });
+            const deleteRecord = async () => {
+              const { sig, pcn } = await loadFixture(createRecord);
 
-            describe("record one", () => {
-              it("sys: 0, mem: 0, acc: 0", async () => {
-                const { sig, pcn } = await loadFixture(deleteRecord);
+              await pcn.connect(sig[0]).deleteRecord({ sys: 1, mem: sig[0].address, acc: 0 })
 
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              return { sig, pcn };
+            }
+
+            describe("sys: 1, mem: 0, acc: 0", () => {
+              it("should result in one record", async () => {
+                const { pcn } = await loadFixture(deleteRecord);
+                expect(await pcn.searchRecord()).to.have.length(1);
+              });
+
+              describe("record one", () => {
+                it("sys: 0, mem: 0, acc: 0", async () => {
+                  const { sig, pcn } = await loadFixture(deleteRecord);
+
+                  expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                  expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+                  expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                });
               });
             });
           });
@@ -305,14 +359,6 @@ describe("Policy", () => {
           const { sig, pcn } = await loadFixture(deployContract);
 
           await pcn.connect(sig[0]).createRecord({ sys: 1, mem: sig[1].address, acc: 0 })
-
-          return { sig, pcn };
-        }
-
-        const deleteRecord = async () => {
-          const { sig, pcn } = await loadFixture(createRecord);
-
-          await pcn.connect(sig[0]).deleteRecord({ sys: 1, mem: sig[1].address, acc: 0 })
 
           return { sig, pcn };
         }
@@ -344,6 +390,14 @@ describe("Policy", () => {
 
         describe("delete", () => {
           describe("sys: 1, mem: 1, acc: 0", () => {
+            const deleteRecord = async () => {
+              const { sig, pcn } = await loadFixture(createRecord);
+
+              await pcn.connect(sig[0]).deleteRecord({ sys: 1, mem: sig[1].address, acc: 0 })
+
+              return { sig, pcn };
+            }
+
             it("should result in one record", async () => {
               const { pcn } = await loadFixture(deleteRecord);
               expect(await pcn.searchRecord()).to.have.length(1);
@@ -377,15 +431,6 @@ describe("Policy", () => {
           await pcn.connect(sig[0]).createRecord({ sys: 1, mem: sig[0].address, acc: 0 })
           await pcn.connect(sig[0]).createRecord({ sys: 1, mem: sig[1].address, acc: 1 })
           await pcn.connect(sig[0]).createRecord({ sys: 1, mem: sig[2].address, acc: 1 })
-
-          return { sig, pcn };
-        }
-
-        const deleteRecord = async () => {
-          const { sig, pcn } = await loadFixture(createRecord);
-
-          await pcn.connect(sig[0]).deleteRecord({ sys: 1, mem: sig[1].address, acc: 1 })
-          await pcn.connect(sig[0]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 1 })
 
           return { sig, pcn };
         }
@@ -437,6 +482,15 @@ describe("Policy", () => {
 
         describe("delete", () => {
           describe("sys: [1, 1], mem: [1, 2], acc: [1, 1]", () => {
+            const deleteRecord = async () => {
+              const { sig, pcn } = await loadFixture(createRecord);
+
+              await pcn.connect(sig[0]).deleteRecord({ sys: 1, mem: sig[1].address, acc: 1 })
+              await pcn.connect(sig[0]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 1 })
+
+              return { sig, pcn };
+            }
+
             it("should result in two records", async () => {
               const { pcn } = await loadFixture(deleteRecord);
               expect(await pcn.searchRecord()).to.have.length(2);
@@ -799,14 +853,6 @@ describe("Policy", () => {
           return { sig, pcn };
         }
 
-        const deleteRecordTwo = async () => {
-          const { sig, pcn } = await loadFixture(createRecordTwo);
-
-          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[0].address, acc: 0 })
-
-          return { sig, pcn };
-        }
-
         it("should result in three records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
           expect(await pcn.searchRecord()).to.have.length(3);
@@ -843,28 +889,38 @@ describe("Policy", () => {
         });
 
         describe("delete", () => {
-          it("should result in two records", async () => {
-            const { pcn } = await loadFixture(deleteRecordTwo);
-            expect(await pcn.searchRecord()).to.have.length(2);
-          });
+          describe("sys: 1, mem: 0, acc: 0", () => {
+            const deleteRecordTwo = async () => {
+              const { sig, pcn } = await loadFixture(createRecordTwo);
 
-          describe("record one", () => {
-            it("sys: 0, mem: 0, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+              await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[0].address, acc: 0 })
 
-              expect((await pcn.searchRecord())[0].sys).to.equal(0);
-              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              return { sig, pcn };
+            }
+
+            it("should result in two records", async () => {
+              const { pcn } = await loadFixture(deleteRecordTwo);
+              expect(await pcn.searchRecord()).to.have.length(2);
             });
-          });
 
-          describe("record two", () => {
-            it("sys: 1, mem: 1, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+            describe("record one", () => {
+              it("sys: 0, mem: 0, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-              expect((await pcn.searchRecord())[1].sys).to.equal(1);
-              expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              });
+            });
+
+            describe("record two", () => {
+              it("sys: 1, mem: 1, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+                expect((await pcn.searchRecord())[1].sys).to.equal(1);
+                expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
+                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+              });
             });
           });
         });
@@ -875,14 +931,6 @@ describe("Policy", () => {
           const { sig, pcn } = await loadFixture(createRecord);
 
           await pcn.connect(sig[1]).createRecord({ sys: 1, mem: sig[0].address, acc: 1 })
-
-          return { sig, pcn };
-        }
-
-        const deleteRecordTwo = async () => {
-          const { sig, pcn } = await loadFixture(createRecordTwo);
-
-          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[0].address, acc: 1 })
 
           return { sig, pcn };
         }
@@ -923,28 +971,38 @@ describe("Policy", () => {
         });
 
         describe("delete", () => {
-          it("should result in two records", async () => {
-            const { pcn } = await loadFixture(deleteRecordTwo);
-            expect(await pcn.searchRecord()).to.have.length(2);
-          });
+          describe("sys: 1, mem: 0, acc: 1", () => {
+            const deleteRecordTwo = async () => {
+              const { sig, pcn } = await loadFixture(createRecordTwo);
 
-          describe("record one", () => {
-            it("sys: 0, mem: 0, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+              await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[0].address, acc: 1 })
 
-              expect((await pcn.searchRecord())[0].sys).to.equal(0);
-              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              return { sig, pcn };
+            }
+
+            it("should result in two records", async () => {
+              const { pcn } = await loadFixture(deleteRecordTwo);
+              expect(await pcn.searchRecord()).to.have.length(2);
             });
-          });
 
-          describe("record two", () => {
-            it("sys: 1, mem: 1, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+            describe("record one", () => {
+              it("sys: 0, mem: 0, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-              expect((await pcn.searchRecord())[1].sys).to.equal(1);
-              expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              });
+            });
+
+            describe("record two", () => {
+              it("sys: 1, mem: 1, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+                expect((await pcn.searchRecord())[1].sys).to.equal(1);
+                expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
+                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+              });
             });
           });
         });
@@ -955,14 +1013,6 @@ describe("Policy", () => {
           const { sig, pcn } = await loadFixture(createRecord);
 
           await pcn.connect(sig[1]).createRecord({ sys: 1, mem: sig[0].address, acc: 2 })
-
-          return { sig, pcn };
-        }
-
-        const deleteRecordTwo = async () => {
-          const { sig, pcn } = await loadFixture(createRecordTwo);
-
-          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[0].address, acc: 2 })
 
           return { sig, pcn };
         }
@@ -1003,28 +1053,38 @@ describe("Policy", () => {
         });
 
         describe("delete", () => {
-          it("should result in two records", async () => {
-            const { pcn } = await loadFixture(deleteRecordTwo);
-            expect(await pcn.searchRecord()).to.have.length(2);
-          });
+          describe("sys: 1, mem: 0, acc: 2", () => {
+            const deleteRecordTwo = async () => {
+              const { sig, pcn } = await loadFixture(createRecordTwo);
 
-          describe("record one", () => {
-            it("sys: 0, mem: 0, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+              await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[0].address, acc: 2 })
 
-              expect((await pcn.searchRecord())[0].sys).to.equal(0);
-              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              return { sig, pcn };
+            }
+
+            it("should result in two records", async () => {
+              const { pcn } = await loadFixture(deleteRecordTwo);
+              expect(await pcn.searchRecord()).to.have.length(2);
             });
-          });
 
-          describe("record two", () => {
-            it("sys: 1, mem: 1, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+            describe("record one", () => {
+              it("sys: 0, mem: 0, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-              expect((await pcn.searchRecord())[1].sys).to.equal(1);
-              expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              });
+            });
+
+            describe("record two", () => {
+              it("sys: 1, mem: 1, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+                expect((await pcn.searchRecord())[1].sys).to.equal(1);
+                expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
+                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+              });
             });
           });
         });
@@ -1059,14 +1119,6 @@ describe("Policy", () => {
           const { sig, pcn } = await loadFixture(createRecord);
 
           await pcn.connect(sig[1]).createRecord({ sys: 1, mem: sig[2].address, acc: 0 })
-
-          return { sig, pcn };
-        }
-
-        const deleteRecordTwo = async () => {
-          const { sig, pcn } = await loadFixture(createRecordTwo);
-
-          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 0 })
 
           return { sig, pcn };
         }
@@ -1107,28 +1159,38 @@ describe("Policy", () => {
         });
 
         describe("delete", () => {
-          it("should result in two records", async () => {
-            const { pcn } = await loadFixture(deleteRecordTwo);
-            expect(await pcn.searchRecord()).to.have.length(2);
-          });
+          describe("sys: 1, mem: 2, acc: 0", () => {
+            const deleteRecordTwo = async () => {
+              const { sig, pcn } = await loadFixture(createRecordTwo);
 
-          describe("record one", () => {
-            it("sys: 0, mem: 0, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+              await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 0 })
 
-              expect((await pcn.searchRecord())[0].sys).to.equal(0);
-              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              return { sig, pcn };
+            }
+
+            it("should result in two records", async () => {
+              const { pcn } = await loadFixture(deleteRecordTwo);
+              expect(await pcn.searchRecord()).to.have.length(2);
             });
-          });
 
-          describe("record two", () => {
-            it("sys: 1, mem: 1, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+            describe("record one", () => {
+              it("sys: 0, mem: 0, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-              expect((await pcn.searchRecord())[1].sys).to.equal(1);
-              expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              });
+            });
+
+            describe("record two", () => {
+              it("sys: 1, mem: 1, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+                expect((await pcn.searchRecord())[1].sys).to.equal(1);
+                expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
+                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+              });
             });
           });
         });
@@ -1139,14 +1201,6 @@ describe("Policy", () => {
           const { sig, pcn } = await loadFixture(createRecord);
 
           await pcn.connect(sig[1]).createRecord({ sys: 1, mem: sig[2].address, acc: 1 })
-
-          return { sig, pcn };
-        }
-
-        const deleteRecordTwo = async () => {
-          const { sig, pcn } = await loadFixture(createRecordTwo);
-
-          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 1 })
 
           return { sig, pcn };
         }
@@ -1187,28 +1241,38 @@ describe("Policy", () => {
         });
 
         describe("delete", () => {
-          it("should result in two records", async () => {
-            const { pcn } = await loadFixture(deleteRecordTwo);
-            expect(await pcn.searchRecord()).to.have.length(2);
-          });
+          describe("sys: 1, mem: 2, acc: 1", () => {
+            const deleteRecordTwo = async () => {
+              const { sig, pcn } = await loadFixture(createRecordTwo);
 
-          describe("record one", () => {
-            it("sys: 0, mem: 0, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+              await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 1 })
 
-              expect((await pcn.searchRecord())[0].sys).to.equal(0);
-              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              return { sig, pcn };
+            }
+
+            it("should result in two records", async () => {
+              const { pcn } = await loadFixture(deleteRecordTwo);
+              expect(await pcn.searchRecord()).to.have.length(2);
             });
-          });
 
-          describe("record two", () => {
-            it("sys: 1, mem: 1, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+            describe("record one", () => {
+              it("sys: 0, mem: 0, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-              expect((await pcn.searchRecord())[1].sys).to.equal(1);
-              expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              });
+            });
+
+            describe("record two", () => {
+              it("sys: 1, mem: 1, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+                expect((await pcn.searchRecord())[1].sys).to.equal(1);
+                expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
+                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+              });
             });
           });
         });
@@ -1219,14 +1283,6 @@ describe("Policy", () => {
           const { sig, pcn } = await loadFixture(createRecord);
 
           await pcn.connect(sig[1]).createRecord({ sys: 1, mem: sig[2].address, acc: 2 })
-
-          return { sig, pcn };
-        }
-
-        const deleteRecordTwo = async () => {
-          const { sig, pcn } = await loadFixture(createRecordTwo);
-
-          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 2 })
 
           return { sig, pcn };
         }
@@ -1267,28 +1323,38 @@ describe("Policy", () => {
         });
 
         describe("delete", () => {
-          it("should result in two records", async () => {
-            const { pcn } = await loadFixture(deleteRecordTwo);
-            expect(await pcn.searchRecord()).to.have.length(2);
-          });
+          describe("sys: 1, mem: 2, acc: 2", () => {
+            const deleteRecordTwo = async () => {
+              const { sig, pcn } = await loadFixture(createRecordTwo);
 
-          describe("record one", () => {
-            it("sys: 0, mem: 0, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+              await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 2 })
 
-              expect((await pcn.searchRecord())[0].sys).to.equal(0);
-              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              return { sig, pcn };
+            }
+
+            it("should result in two records", async () => {
+              const { pcn } = await loadFixture(deleteRecordTwo);
+              expect(await pcn.searchRecord()).to.have.length(2);
             });
-          });
 
-          describe("record two", () => {
-            it("sys: 1, mem: 1, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+            describe("record one", () => {
+              it("sys: 0, mem: 0, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-              expect((await pcn.searchRecord())[1].sys).to.equal(1);
-              expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              });
+            });
+
+            describe("record two", () => {
+              it("sys: 1, mem: 1, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+                expect((await pcn.searchRecord())[1].sys).to.equal(1);
+                expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
+                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+              });
             });
           });
         });
@@ -1601,6 +1667,131 @@ describe("Policy", () => {
         });
       });
     });
+
+    describe("sys: 0, mem: 0, acc: 0", () => {
+      describe("create", () => {
+        describe("sys: 1, mem: 0, acc: 0", () => {
+          const createRecordTwo = async () => {
+            const { sig, pcn } = await loadFixture(createRecord);
+
+            await pcn.connect(sig[0]).createRecord({ sys: 1, mem: sig[0].address, acc: 0 })
+
+            return { sig, pcn };
+          }
+
+          it("should result in three records", async () => {
+            const { pcn } = await loadFixture(createRecordTwo);
+            expect(await pcn.searchRecord()).to.have.length(3);
+          });
+
+          describe("record one", () => {
+            it("sys: 0, mem: 0, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(createRecordTwo);
+
+              expect((await pcn.searchRecord())[0].sys).to.equal(0);
+              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            });
+          });
+
+          describe("record two", () => {
+            it("sys: 1, mem: 1, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(createRecordTwo);
+
+              expect((await pcn.searchRecord())[1].sys).to.equal(1);
+              expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
+              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            });
+          });
+
+          describe("record three", () => {
+            it("sys: 1, mem: 0, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(createRecordTwo);
+
+              expect((await pcn.searchRecord())[2].sys).to.equal(1);
+              expect((await pcn.searchRecord())[2].mem).to.equal(sig[0].address);
+              expect((await pcn.searchRecord())[2].acc).to.equal(0);
+            });
+          });
+
+          describe("delete", () => {
+            describe("sys: 1, mem: 0, acc: 0", () => {
+              const deleteRecordTwo = async () => {
+                const { sig, pcn } = await loadFixture(createRecordTwo);
+
+                await pcn.connect(sig[0]).deleteRecord({ sys: 1, mem: sig[0].address, acc: 0 })
+
+                return { sig, pcn };
+              }
+
+              it("should result in two records", async () => {
+                const { pcn } = await loadFixture(deleteRecordTwo);
+                expect(await pcn.searchRecord()).to.have.length(2);
+              });
+
+              describe("record one", () => {
+                it("sys: 0, mem: 0, acc: 0", async () => {
+                  const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+                  expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                  expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+                  expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                });
+              });
+
+              describe("record two", () => {
+                it("sys: 1, mem: 1, acc: 0", async () => {
+                  const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+                  expect((await pcn.searchRecord())[1].sys).to.equal(1);
+                  expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
+                  expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                });
+              });
+            });
+          });
+
+          describe("sys: 1, mem: 1, acc: 0", () => {
+            describe("delete", () => {
+              describe("sys: 1, mem: 0, acc: 0", () => {
+                const deleteRecordTwo = async () => {
+                  const { sig, pcn } = await loadFixture(createRecordTwo);
+
+                  await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[0].address, acc: 0 })
+
+                  return { sig, pcn };
+                }
+
+                it("should result in two records", async () => {
+                  const { pcn } = await loadFixture(deleteRecordTwo);
+                  expect(await pcn.searchRecord()).to.have.length(2);
+                });
+
+                describe("record one", () => {
+                  it("sys: 0, mem: 0, acc: 0", async () => {
+                    const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+                    expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                    expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+                    expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                  });
+                });
+
+                describe("record two", () => {
+                  it("sys: 1, mem: 1, acc: 0", async () => {
+                    const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+                    expect((await pcn.searchRecord())[1].sys).to.equal(1);
+                    expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
+                    expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+    });
   });
 
   describe("sys: 1, mem: 1, acc: 1", () => {
@@ -1751,14 +1942,6 @@ describe("Policy", () => {
           return { sig, pcn };
         }
 
-        const deleteRecordTwo = async () => {
-          const { sig, pcn } = await loadFixture(createRecordTwo);
-
-          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 1 })
-
-          return { sig, pcn };
-        }
-
         it("should result in four records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
           expect(await pcn.searchRecord()).to.have.length(4);
@@ -1805,38 +1988,48 @@ describe("Policy", () => {
         });
 
         describe("delete", () => {
-          it("should result in three records", async () => {
-            const { pcn } = await loadFixture(deleteRecordTwo);
-            expect(await pcn.searchRecord()).to.have.length(3);
-          });
+          describe("sys: 1, mem: 2, acc: 1", () => {
+            const deleteRecordTwo = async () => {
+              const { sig, pcn } = await loadFixture(createRecordTwo);
 
-          describe("record one", () => {
-            it("sys: 0, mem: 0, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+              await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 1 })
 
-              expect((await pcn.searchRecord())[0].sys).to.equal(0);
-              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              return { sig, pcn };
+            }
+
+            it("should result in three records", async () => {
+              const { pcn } = await loadFixture(deleteRecordTwo);
+              expect(await pcn.searchRecord()).to.have.length(3);
             });
-          });
 
-          describe("record two", () => {
-            it("sys: 1, mem: 0, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+            describe("record one", () => {
+              it("sys: 0, mem: 0, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-              expect((await pcn.searchRecord())[1].sys).to.equal(1);
-              expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
-              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              });
             });
-          });
 
-          describe("record three", () => {
-            it("sys: 1, mem: 1, acc: 1", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+            describe("record two", () => {
+              it("sys: 1, mem: 0, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-              expect((await pcn.searchRecord())[2].sys).to.equal(1);
-              expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
-              expect((await pcn.searchRecord())[2].acc).to.equal(1);
+                expect((await pcn.searchRecord())[1].sys).to.equal(1);
+                expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
+                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+              });
+            });
+
+            describe("record three", () => {
+              it("sys: 1, mem: 1, acc: 1", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+                expect((await pcn.searchRecord())[2].sys).to.equal(1);
+                expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
+                expect((await pcn.searchRecord())[2].acc).to.equal(1);
+              });
             });
           });
         });
@@ -1847,14 +2040,6 @@ describe("Policy", () => {
           const { sig, pcn } = await loadFixture(createRecord);
 
           await pcn.connect(sig[1]).createRecord({ sys: 1, mem: sig[2].address, acc: 2 })
-
-          return { sig, pcn };
-        }
-
-        const deleteRecordTwo = async () => {
-          const { sig, pcn } = await loadFixture(createRecordTwo);
-
-          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 2 })
 
           return { sig, pcn };
         }
@@ -1905,38 +2090,48 @@ describe("Policy", () => {
         });
 
         describe("delete", () => {
-          it("should result in three records", async () => {
-            const { pcn } = await loadFixture(deleteRecordTwo);
-            expect(await pcn.searchRecord()).to.have.length(3);
-          });
+          describe("sys: 1, mem: 2, acc: 2", () => {
+            const deleteRecordTwo = async () => {
+              const { sig, pcn } = await loadFixture(createRecordTwo);
 
-          describe("record one", () => {
-            it("sys: 0, mem: 0, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+              await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 2 })
 
-              expect((await pcn.searchRecord())[0].sys).to.equal(0);
-              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              return { sig, pcn };
+            }
+
+            it("should result in three records", async () => {
+              const { pcn } = await loadFixture(deleteRecordTwo);
+              expect(await pcn.searchRecord()).to.have.length(3);
             });
-          });
 
-          describe("record two", () => {
-            it("sys: 1, mem: 0, acc: 0", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+            describe("record one", () => {
+              it("sys: 0, mem: 0, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-              expect((await pcn.searchRecord())[1].sys).to.equal(1);
-              expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
-              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              });
             });
-          });
 
-          describe("record three", () => {
-            it("sys: 1, mem: 1, acc: 1", async () => {
-              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+            describe("record two", () => {
+              it("sys: 1, mem: 0, acc: 0", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-              expect((await pcn.searchRecord())[2].sys).to.equal(1);
-              expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
-              expect((await pcn.searchRecord())[2].acc).to.equal(1);
+                expect((await pcn.searchRecord())[1].sys).to.equal(1);
+                expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
+                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+              });
+            });
+
+            describe("record three", () => {
+              it("sys: 1, mem: 1, acc: 1", async () => {
+                const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+                expect((await pcn.searchRecord())[2].sys).to.equal(1);
+                expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
+                expect((await pcn.searchRecord())[2].acc).to.equal(1);
+              });
             });
           });
         });
@@ -2256,6 +2451,18 @@ describe("Policy", () => {
           const { sig, pcn } = await loadFixture(createRecord);
           const tnx = pcn.connect(sig[1]).deleteRecord({ sys: 2, mem: sig[2].address, acc: 2 })
           await expect(tnx).to.be.revertedWithoutReason();
+        });
+      });
+    });
+
+    describe("sys: 1, mem: 0, acc: 0", () => {
+      describe("delete", () => {
+        describe("sys: 1, mem: 0, acc: 0", () => {
+          it("should revert", async () => {
+            const { sig, pcn } = await loadFixture(createRecord);
+            const tnx = pcn.connect(sig[0]).deleteRecord({ sys: 1, mem: sig[0].address, acc: 0 })
+            await expect(tnx).to.be.revertedWithoutReason();
+          });
         });
       });
     });
