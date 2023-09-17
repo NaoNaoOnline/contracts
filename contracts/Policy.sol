@@ -6,10 +6,10 @@ import "./Triple.sol";
 /// @title Policy Management
 /// @author xh3b4sd
 /// @notice Policy is a contextual RBAC manager.
-/// @notice Permissions are expressed in SMAs (system-member-access) groups.
-/// @notice System refers to context or resource.
-/// @notice Member refers to account or user.
-/// @notice Access refers to permission or level.
+/// @notice Permissions are expressed in SMAs (system-member-access).
+/// @notice System refers to context, resource or scope.
+/// @notice Member refers to account, identity or user.
+/// @notice Access refers to level, permission or role.
 contract Policy {
     ///
     /// EXTENSION
@@ -46,16 +46,21 @@ contract Policy {
     /// CONSTRUCTOR
     ///
 
-    /// @notice TODO
+    /// @notice constructor for initializing an instance of the Policy contract.
+    /// @notice Creates first record for the deployer address with access zero in system zero.
+    /// @notice Emits Created for the added record.
     constructor() {
         _states._createRecord(Triple.Record({sys: 0, mem: msg.sender, acc: 0}));
+        emit Created(0, msg.sender, 0);
     }
 
     ///
     /// PUBLIC
     ///
 
-    /// @notice TODO
+    /// @notice createRecord allows privileged members to add records onchain.
+    /// @notice Reverts on unprivileged access.
+    /// @notice Emits Created for the added record.
     function createRecord(Triple.Record memory rec) public {
         if (!_verifyCreate(rec)) {
             revert();
@@ -67,7 +72,9 @@ contract Policy {
         }
     }
 
-    /// @notice TODO
+    /// @notice deleteRecord allows privileged members to remove records onchain.
+    /// @notice Reverts on unprivileged access.
+    /// @notice Emits Deleted for the removed record.
     function deleteRecord(Triple.Record memory rec) public {
         if (!_verifyDelete(rec)) {
             revert();
@@ -83,7 +90,7 @@ contract Policy {
     /// VIEW
     ///
 
-    /// @notice TODO
+    /// @notice searchRecord returns all records managed internally.
     function searchRecord() public view returns (Triple.Record[] memory) {
         return _states._searchRecord();
     }
@@ -92,7 +99,7 @@ contract Policy {
     /// INTERNAL
     ///
 
-    /// @notice TODO
+    /// @notice _verifyCreate expresses whether adding the given record is allowed.
     function _verifyCreate(
         Triple.Record memory rec
     ) internal view returns (bool) {
@@ -127,8 +134,8 @@ contract Policy {
         // Otherwise msg.caller might be gaining access zero.
         bool chp = _states._searchAccess(rec.sys, msg.sender) <= rec.acc;
 
-        // Creating a new system. Only access zero in system zero can create a
-        // new system.
+        // Only access zero in system zero can create a new system, for
+        // themselves or others.
         //
         //     The system to be created must not already exist.
         //     The caller must have access zero in system zero.
@@ -138,8 +145,8 @@ contract Policy {
             return true;
         }
 
-        // Adding a new member to an existing system. Anyone in any given system
-        // can add anyone to that system with equal or lower access.
+        // Anyone in any given system can add anyone to that system with equal
+        // or lower access.
         //
         //     The system to add the member to must exist.
         //     The member to add must not already exist in that system.
@@ -151,9 +158,21 @@ contract Policy {
             return true;
         }
 
+        // Access zero in system zero can add themselves to any given system.
+        //
+        //     The system to add the member to must exist.
+        //     The caller must have access zero in system zero.
+        //     The member to add must not already exist in that system.
+        //     The caller must add themselves.
+        //
+        if (dse && czz && !dme && cim) {
+            return true;
+        }
+
         return false;
     }
 
+    /// @notice _verifyDelete expresses whether removing the given record is allowed.
     function _verifyDelete(
         Triple.Record memory rec
     ) internal view returns (bool) {
@@ -194,6 +213,12 @@ contract Policy {
         // be used together with dse (does system exist). Otherwise an empty
         // member count for the given access will be used.
         bool maz = _states._searchAccess(rec.sys, 0) > 1;
+
+        // saz, system access zero, expresses whether the given member has
+        // access zero in the given system.
+        bool saz = _states._existsRecord(
+            Triple.Record({sys: rec.sys, mem: rec.mem, acc: 0})
+        );
 
         // oom, only one member, expresses whether the given system has only one
         // member.
@@ -236,7 +261,7 @@ contract Policy {
         }
 
         // Access zero in system zero can remove themselves from any system that
-        // is not system zero.
+        // is not system zero and delete that system in the process.
         //
         //     The record to remove must exist as given.
         //     The system to remove the member from must exist.
@@ -250,17 +275,17 @@ contract Policy {
             return true;
         }
 
-        // Access zero in system zero can remove themselves from system
-        // zero.
+        // Access zero in any given system can be removed from that system by
+        // access zero, if that system has many access zero members.
         //
         //     The record to remove must exist as given.
         //     The system to remove the member from must exist.
         //     The member to remove must exist in that system.
-        //     The caller must have access zero in system zero.
+        //     The member to remove must have access zero in that system.
         //     The system must have many access zero members.
-        //     The system to remove the member from must be system zero.
+        //     The caller must have equal or higher access in that system.
         //
-        if (dre && dse && dme && czz && maz && rec.sys == 0) {
+        if (dre && dse && dme && saz && maz && chp) {
             return true;
         }
 

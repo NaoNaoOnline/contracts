@@ -3,20 +3,22 @@ pragma solidity 0.8.21;
 
 /// @title Triple Data Structure
 /// @author xh3b4sd
-/// @notice TODO
+/// @notice Triple manages a list of structures, tuples of three.
+/// @notice Should only be used for the Policy contract.
 library Triple {
     ///
     /// TYPES
     ///
 
-    /// @notice TODO
+    /// @notice Record represents a single SMA recorded onchain.
     struct Record {
         uint256 sys;
         address mem;
         uint256 acc;
     }
 
-    /// @notice TODO
+    /// @notice States is the internal structure for state management.
+    /// @notice Used to keep track of created and deleted records.
     struct States {
         // reclis is the complete list of records.
         //
@@ -55,6 +57,10 @@ library Triple {
         //     }
         //
         mapping(uint256 => uint256) memcnt;
+        // acccnt tracks the amount of members with a specific access within a
+        // given system. Knowing e.g. how many access zero members a system has
+        // enables us to guarantee at least one access zero member at all times
+        // inside that system.
         //
         //     acccnt[sys][acc] = len(acc)
         //
@@ -71,7 +77,9 @@ library Triple {
     /// INTERNAL
     ///
 
-    /// @notice TODO
+    /// @notice _createRecord adds the given record to the internal state.
+    /// @notice Does not safeguard against unintended use.
+    /// @notice The given record must not exist.
     function _createRecord(States storage sta, Record memory rec) internal {
         sta.reclis.push(rec);
 
@@ -82,7 +90,9 @@ library Triple {
         sta.acccnt[rec.sys][rec.acc] += 1;
     }
 
-    /// @notice TODO
+    /// @notice _deleteRecord removes the given record from the internal state.
+    /// @notice Does not safeguard against unintended use.
+    /// @notice The given record must exist.
     function _deleteRecord(States storage sta, Record memory rec) internal {
         // The last element within the record list is moved to the position of
         // the record that we are going to remove.
@@ -135,7 +145,7 @@ library Triple {
     /// VIEW
     ///
 
-    /// @notice TODO
+    /// @notice _existsMember expresses whether the given system member combination exists.
     function _existsMember(
         States storage sta,
         uint256 sys,
@@ -145,6 +155,7 @@ library Triple {
         return sys == exi.sys && mem == exi.mem;
     }
 
+    /// @notice _existsRecord expresses whether the given record exists.
     function _existsRecord(
         States storage sta,
         Record memory rec
@@ -153,6 +164,7 @@ library Triple {
         return rec.sys == exi.sys && rec.mem == exi.mem && rec.acc == exi.acc;
     }
 
+    /// @notice _existsSystem expresses whether the given system exists.
     function _existsSystem(
         States storage sta,
         uint256 sys
@@ -160,8 +172,8 @@ library Triple {
         return sta.memcnt[sys] != 0;
     }
 
-    /// @notice TODO
-    /// @notice Must be used with _existsMember.
+    /// @notice _searchAccess returns the access of the member in the given system.
+    /// @notice Must be used together with _existsMember.
     /// @notice Returns 0 if member does not exist.
     function _searchAccess(
         States storage sta,
@@ -172,8 +184,8 @@ library Triple {
         return exi.acc;
     }
 
-    /// @notice TODO
-    /// @notice Must be used with _existsSystem.
+    /// @notice _searchAccess returns the amount of members within the given system having the given access.
+    /// @notice Must be used together with _existsSystem.
     /// @notice Returns 0 if system does not exist.
     function _searchAccess(
         States storage sta,
@@ -183,8 +195,8 @@ library Triple {
         return sta.acccnt[sys][acc];
     }
 
-    /// @notice TODO
-    /// @notice Must be used with _existsSystem.
+    /// @notice _searchMember returns the amount of members within the given system.
+    /// @notice Must be used together with _existsSystem.
     /// @notice Returns 0 if system does not exist.
     function _searchMember(
         States storage sta,
@@ -193,7 +205,7 @@ library Triple {
         return sta.memcnt[sys];
     }
 
-    /// @notice TODO
+    /// @notice _searchRecord returns all records managed internally.
     function _searchRecord(
         States storage sta
     ) internal view returns (Record[] memory) {
