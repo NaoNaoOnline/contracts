@@ -6,7 +6,6 @@ import { ethers } from "hardhat";
 // TODO test that access zero can be replaced in system zero by another access zero
 // TODO test that any member can always remove themselves
 // TODO test that when you are access zero and there is another access zero that you can remove yourself
-// TODO add the delete cases for all createRecordTwo
 describe("Policy", () => {
   const deployContract = async () => {
     const sig = await ethers.getSigners();
@@ -23,18 +22,11 @@ describe("Policy", () => {
     });
 
     describe("record one", () => {
-      it("should have system zero", async () => {
-        const { pcn } = await loadFixture(deployContract);
-        expect((await pcn.searchRecord())[0].sys).to.equal(0);
-      });
-
-      it("should have member address for signer one", async () => {
+      it("sys: 0, mem: 0, acc: 0", async () => {
         const { sig, pcn } = await loadFixture(deployContract);
-        expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-      });
 
-      it("should have access zero", async () => {
-        const { pcn } = await loadFixture(deployContract);
+        expect((await pcn.searchRecord())[0].sys).to.equal(0);
+        expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
         expect((await pcn.searchRecord())[0].acc).to.equal(0);
       });
     });
@@ -81,35 +73,21 @@ describe("Policy", () => {
         });
 
         describe("record one", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
+            expect((await pcn.searchRecord())[0].sys).to.equal(0);
+            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[0].acc).to.equal(0);
           });
         });
 
         describe("record two", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[1].sys).to.equal(0);
-          });
-
-          it("should have member address for signer two", async () => {
+          it("sys: 0, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
+            expect((await pcn.searchRecord())[1].sys).to.equal(0);
+            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
             expect((await pcn.searchRecord())[1].acc).to.equal(0);
           });
         });
@@ -121,19 +99,12 @@ describe("Policy", () => {
               expect(await pcn.searchRecord()).to.have.length(1);
             });
 
-            describe("recod one", () => {
-              it("should have system zero", async () => {
-                const { pcn } = await loadFixture(deleteRecord);
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-              });
-
-              it("should have member address for signer one", async () => {
+            describe("record one", () => {
+              it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecord);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-              });
 
-              it("should have access zero", async () => {
-                const { pcn } = await loadFixture(deleteRecord);
+                expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
                 expect((await pcn.searchRecord())[0].acc).to.equal(0);
               });
             });
@@ -164,35 +135,21 @@ describe("Policy", () => {
         });
 
         describe("record one", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
+            expect((await pcn.searchRecord())[0].sys).to.equal(0);
+            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[0].acc).to.equal(0);
           });
         });
 
         describe("record two", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[1].sys).to.equal(0);
-          });
-
-          it("should have member address for signer two", async () => {
+          it("sys: 0, mem: 1, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-          });
 
-          it("should have access one", async () => {
-            const { pcn } = await loadFixture(createRecord);
+            expect((await pcn.searchRecord())[1].sys).to.equal(0);
+            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
             expect((await pcn.searchRecord())[1].acc).to.equal(1);
           });
         });
@@ -204,19 +161,12 @@ describe("Policy", () => {
               expect(await pcn.searchRecord()).to.have.length(1);
             });
 
-            describe("recod one", () => {
-              it("should have system zero", async () => {
-                const { pcn } = await loadFixture(deleteRecord);
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-              });
-
-              it("should have member address for signer one", async () => {
+            describe("record one", () => {
+              it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecord);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-              });
 
-              it("should have access zero", async () => {
-                const { pcn } = await loadFixture(deleteRecord);
+                expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
                 expect((await pcn.searchRecord())[0].acc).to.equal(0);
               });
             });
@@ -247,35 +197,21 @@ describe("Policy", () => {
         });
 
         describe("record one", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
+            expect((await pcn.searchRecord())[0].sys).to.equal(0);
+            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[0].acc).to.equal(0);
           });
         });
 
         describe("record two", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 1, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
+            expect((await pcn.searchRecord())[1].sys).to.equal(1);
+            expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[1].acc).to.equal(0);
           });
         });
@@ -287,19 +223,12 @@ describe("Policy", () => {
               expect(await pcn.searchRecord()).to.have.length(1);
             });
 
-            describe("recod one", () => {
-              it("should have system zero", async () => {
-                const { pcn } = await loadFixture(deleteRecord);
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-              });
-
-              it("should have member address for signer one", async () => {
+            describe("record one", () => {
+              it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecord);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-              });
 
-              it("should have access zero", async () => {
-                const { pcn } = await loadFixture(deleteRecord);
+                expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
                 expect((await pcn.searchRecord())[0].acc).to.equal(0);
               });
             });
@@ -338,35 +267,21 @@ describe("Policy", () => {
         });
 
         describe("record one", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
+            expect((await pcn.searchRecord())[0].sys).to.equal(0);
+            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[0].acc).to.equal(0);
           });
         });
 
         describe("record two", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-          });
-
-          it("should have member address for signer two", async () => {
+          it("sys: 1, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
+            expect((await pcn.searchRecord())[1].sys).to.equal(1);
+            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
             expect((await pcn.searchRecord())[1].acc).to.equal(0);
           });
         });
@@ -378,19 +293,12 @@ describe("Policy", () => {
               expect(await pcn.searchRecord()).to.have.length(1);
             });
 
-            describe("recod one", () => {
-              it("should have system zero", async () => {
-                const { pcn } = await loadFixture(deleteRecord);
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-              });
-
-              it("should have member address for signer one", async () => {
+            describe("record one", () => {
+              it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecord);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-              });
 
-              it("should have access zero", async () => {
-                const { pcn } = await loadFixture(deleteRecord);
+                expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
                 expect((await pcn.searchRecord())[0].acc).to.equal(0);
               });
             });
@@ -432,69 +340,41 @@ describe("Policy", () => {
         });
 
         describe("record one", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
+            expect((await pcn.searchRecord())[0].sys).to.equal(0);
+            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[0].acc).to.equal(0);
           });
         });
 
         describe("record two", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 1, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecord);
+            expect((await pcn.searchRecord())[1].sys).to.equal(1);
+            expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[1].acc).to.equal(0);
           });
         });
 
         describe("record three", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-          });
-
-          it("should have member address for signer two", async () => {
+          it("sys: 1, mem: 1, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
-          });
 
-          it("should have access one", async () => {
-            const { pcn } = await loadFixture(createRecord);
+            expect((await pcn.searchRecord())[2].sys).to.equal(1);
+            expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
             expect((await pcn.searchRecord())[2].acc).to.equal(1);
           });
         });
 
         describe("record four", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[3].sys).to.equal(1);
-          });
-
-          it("should have member address for signer three", async () => {
+          it("sys: 1, mem: 2, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
-            expect((await pcn.searchRecord())[3].mem).to.equal(sig[2].address);
-          });
 
-          it("should have access one", async () => {
-            const { pcn } = await loadFixture(createRecord);
+            expect((await pcn.searchRecord())[3].sys).to.equal(1);
+            expect((await pcn.searchRecord())[3].mem).to.equal(sig[2].address);
             expect((await pcn.searchRecord())[3].acc).to.equal(1);
           });
         });
@@ -506,36 +386,22 @@ describe("Policy", () => {
               expect(await pcn.searchRecord()).to.have.length(2);
             });
 
-            describe("recod one", () => {
-              it("should have system zero", async () => {
-                const { pcn } = await loadFixture(deleteRecord);
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-              });
-
-              it("should have member address for signer one", async () => {
+            describe("record one", () => {
+              it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecord);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-              });
 
-              it("should have access zero", async () => {
-                const { pcn } = await loadFixture(deleteRecord);
+                expect((await pcn.searchRecord())[0].sys).to.equal(0);
+                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
                 expect((await pcn.searchRecord())[0].acc).to.equal(0);
               });
             });
 
-            describe("recod two", () => {
-              it("should have system one", async () => {
-                const { pcn } = await loadFixture(deleteRecord);
-                expect((await pcn.searchRecord())[1].sys).to.equal(1);
-              });
-
-              it("should have member address for signer one", async () => {
+            describe("record two", () => {
+              it("sys: 1, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecord);
-                expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
-              });
 
-              it("should have access zero", async () => {
-                const { pcn } = await loadFixture(deleteRecord);
+                expect((await pcn.searchRecord())[1].sys).to.equal(1);
+                expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
                 expect((await pcn.searchRecord())[1].acc).to.equal(0);
               });
             });
@@ -709,19 +575,12 @@ describe("Policy", () => {
           expect(await pcn.searchRecord()).to.have.length(1);
         });
 
-        describe("recod one", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(deleteRecord);
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-          });
-
-          it("should have member address for signer one", async () => {
+        describe("record one", () => {
+          it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(deleteRecord);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(deleteRecord);
+            expect((await pcn.searchRecord())[0].sys).to.equal(0);
+            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[0].acc).to.equal(0);
           });
         });
@@ -885,59 +744,73 @@ describe("Policy", () => {
           return { sig, pcn };
         }
 
+        const deleteRecordTwo = async () => {
+          const { sig, pcn } = await loadFixture(createRecordTwo);
+
+          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[0].address, acc: 0 })
+
+          return { sig, pcn };
+        }
+
         it("should result in three records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
           expect(await pcn.searchRecord()).to.have.length(3);
         });
 
         describe("record one", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[0].sys).to.equal(0);
+            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[0].acc).to.equal(0);
           });
         });
 
         describe("record two", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-          });
-
-          it("should have member address for signer two", async () => {
+          it("sys: 1, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[1].sys).to.equal(1);
+            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
             expect((await pcn.searchRecord())[1].acc).to.equal(0);
           });
         });
 
         describe("record three", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 1, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
+
+            expect((await pcn.searchRecord())[2].sys).to.equal(1);
             expect((await pcn.searchRecord())[2].mem).to.equal(sig[0].address);
+            expect((await pcn.searchRecord())[2].acc).to.equal(0);
+          });
+        });
+
+        describe("delete", () => {
+          it("should result in two records", async () => {
+            const { pcn } = await loadFixture(deleteRecordTwo);
+            expect(await pcn.searchRecord()).to.have.length(2);
           });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].acc).to.equal(0);
+          describe("record one", () => {
+            it("sys: 0, mem: 0, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[0].sys).to.equal(0);
+              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            });
+          });
+
+          describe("record two", () => {
+            it("sys: 1, mem: 1, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[1].sys).to.equal(1);
+              expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
+              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            });
           });
         });
       });
@@ -951,59 +824,73 @@ describe("Policy", () => {
           return { sig, pcn };
         }
 
+        const deleteRecordTwo = async () => {
+          const { sig, pcn } = await loadFixture(createRecordTwo);
+
+          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[0].address, acc: 1 })
+
+          return { sig, pcn };
+        }
+
         it("should result in three records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
           expect(await pcn.searchRecord()).to.have.length(3);
         });
 
         describe("record one", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[0].sys).to.equal(0);
+            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[0].acc).to.equal(0);
           });
         });
 
         describe("record two", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-          });
-
-          it("should have member address for signer two", async () => {
+          it("sys: 1, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[1].sys).to.equal(1);
+            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
             expect((await pcn.searchRecord())[1].acc).to.equal(0);
           });
         });
 
         describe("record three", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 1, mem: 0, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
+
+            expect((await pcn.searchRecord())[2].sys).to.equal(1);
             expect((await pcn.searchRecord())[2].mem).to.equal(sig[0].address);
+            expect((await pcn.searchRecord())[2].acc).to.equal(1);
+          });
+        });
+
+        describe("delete", () => {
+          it("should result in two records", async () => {
+            const { pcn } = await loadFixture(deleteRecordTwo);
+            expect(await pcn.searchRecord()).to.have.length(2);
           });
 
-          it("should have access one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].acc).to.equal(1);
+          describe("record one", () => {
+            it("sys: 0, mem: 0, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[0].sys).to.equal(0);
+              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            });
+          });
+
+          describe("record two", () => {
+            it("sys: 1, mem: 1, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[1].sys).to.equal(1);
+              expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
+              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            });
           });
         });
       });
@@ -1017,59 +904,73 @@ describe("Policy", () => {
           return { sig, pcn };
         }
 
+        const deleteRecordTwo = async () => {
+          const { sig, pcn } = await loadFixture(createRecordTwo);
+
+          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[0].address, acc: 2 })
+
+          return { sig, pcn };
+        }
+
         it("should result in three records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
           expect(await pcn.searchRecord()).to.have.length(3);
         });
 
         describe("record one", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[0].sys).to.equal(0);
+            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[0].acc).to.equal(0);
           });
         });
 
         describe("record two", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-          });
-
-          it("should have member address for signer two", async () => {
+          it("sys: 1, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[1].sys).to.equal(1);
+            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
             expect((await pcn.searchRecord())[1].acc).to.equal(0);
           });
         });
 
         describe("record three", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 1, mem: 0, acc: 2", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
+
+            expect((await pcn.searchRecord())[2].sys).to.equal(1);
             expect((await pcn.searchRecord())[2].mem).to.equal(sig[0].address);
+            expect((await pcn.searchRecord())[2].acc).to.equal(2);
+          });
+        });
+
+        describe("delete", () => {
+          it("should result in two records", async () => {
+            const { pcn } = await loadFixture(deleteRecordTwo);
+            expect(await pcn.searchRecord()).to.have.length(2);
           });
 
-          it("should have access two", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].acc).to.equal(2);
+          describe("record one", () => {
+            it("sys: 0, mem: 0, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[0].sys).to.equal(0);
+              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            });
+          });
+
+          describe("record two", () => {
+            it("sys: 1, mem: 1, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[1].sys).to.equal(1);
+              expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
+              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            });
           });
         });
       });
@@ -1107,59 +1008,73 @@ describe("Policy", () => {
           return { sig, pcn };
         }
 
+        const deleteRecordTwo = async () => {
+          const { sig, pcn } = await loadFixture(createRecordTwo);
+
+          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 0 })
+
+          return { sig, pcn };
+        }
+
         it("should result in three records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
           expect(await pcn.searchRecord()).to.have.length(3);
         });
 
         describe("record one", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[0].sys).to.equal(0);
+            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[0].acc).to.equal(0);
           });
         });
 
         describe("record two", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-          });
-
-          it("should have member address for signer two", async () => {
+          it("sys: 1, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[1].sys).to.equal(1);
+            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
             expect((await pcn.searchRecord())[1].acc).to.equal(0);
           });
         });
 
         describe("record three", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-          });
-
-          it("should have member address for signer three", async () => {
+          it("sys: 1, mem: 2, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
+
+            expect((await pcn.searchRecord())[2].sys).to.equal(1);
             expect((await pcn.searchRecord())[2].mem).to.equal(sig[2].address);
+            expect((await pcn.searchRecord())[2].acc).to.equal(0);
+          });
+        });
+
+        describe("delete", () => {
+          it("should result in two records", async () => {
+            const { pcn } = await loadFixture(deleteRecordTwo);
+            expect(await pcn.searchRecord()).to.have.length(2);
           });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].acc).to.equal(0);
+          describe("record one", () => {
+            it("sys: 0, mem: 0, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[0].sys).to.equal(0);
+              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            });
+          });
+
+          describe("record two", () => {
+            it("sys: 1, mem: 1, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[1].sys).to.equal(1);
+              expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
+              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            });
           });
         });
       });
@@ -1173,59 +1088,73 @@ describe("Policy", () => {
           return { sig, pcn };
         }
 
+        const deleteRecordTwo = async () => {
+          const { sig, pcn } = await loadFixture(createRecordTwo);
+
+          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 1 })
+
+          return { sig, pcn };
+        }
+
         it("should result in three records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
           expect(await pcn.searchRecord()).to.have.length(3);
         });
 
         describe("record one", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[0].sys).to.equal(0);
+            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[0].acc).to.equal(0);
           });
         });
 
         describe("record two", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-          });
-
-          it("should have member address for signer two", async () => {
+          it("sys: 1, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[1].sys).to.equal(1);
+            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
             expect((await pcn.searchRecord())[1].acc).to.equal(0);
           });
         });
 
         describe("record three", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-          });
-
-          it("should have member address for signer three", async () => {
+          it("sys: 1, mem: 2, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
+
+            expect((await pcn.searchRecord())[2].sys).to.equal(1);
             expect((await pcn.searchRecord())[2].mem).to.equal(sig[2].address);
+            expect((await pcn.searchRecord())[2].acc).to.equal(1);
+          });
+        });
+
+        describe("delete", () => {
+          it("should result in two records", async () => {
+            const { pcn } = await loadFixture(deleteRecordTwo);
+            expect(await pcn.searchRecord()).to.have.length(2);
           });
 
-          it("should have access one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].acc).to.equal(1);
+          describe("record one", () => {
+            it("sys: 0, mem: 0, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[0].sys).to.equal(0);
+              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            });
+          });
+
+          describe("record two", () => {
+            it("sys: 1, mem: 1, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[1].sys).to.equal(1);
+              expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
+              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            });
           });
         });
       });
@@ -1239,59 +1168,73 @@ describe("Policy", () => {
           return { sig, pcn };
         }
 
+        const deleteRecordTwo = async () => {
+          const { sig, pcn } = await loadFixture(createRecordTwo);
+
+          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 2 })
+
+          return { sig, pcn };
+        }
+
         it("should result in three records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
           expect(await pcn.searchRecord()).to.have.length(3);
         });
 
         describe("record one", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[0].sys).to.equal(0);
+            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[0].acc).to.equal(0);
           });
         });
 
         describe("record two", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-          });
-
-          it("should have member address for signer two", async () => {
+          it("sys: 1, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[1].sys).to.equal(1);
+            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
             expect((await pcn.searchRecord())[1].acc).to.equal(0);
           });
         });
 
         describe("record three", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-          });
-
-          it("should have member address for signer three", async () => {
+          it("sys: 1, mem: 2, acc: 2", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
+
+            expect((await pcn.searchRecord())[2].sys).to.equal(1);
             expect((await pcn.searchRecord())[2].mem).to.equal(sig[2].address);
+            expect((await pcn.searchRecord())[2].acc).to.equal(2);
+          });
+        });
+
+        describe("delete", () => {
+          it("should result in two records", async () => {
+            const { pcn } = await loadFixture(deleteRecordTwo);
+            expect(await pcn.searchRecord()).to.have.length(2);
           });
 
-          it("should have access two", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].acc).to.equal(2);
+          describe("record one", () => {
+            it("sys: 0, mem: 0, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[0].sys).to.equal(0);
+              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            });
+          });
+
+          describe("record two", () => {
+            it("sys: 1, mem: 1, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[1].sys).to.equal(1);
+              expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
+              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            });
           });
         });
       });
@@ -1519,76 +1462,93 @@ describe("Policy", () => {
           return { sig, pcn };
         }
 
+        const deleteRecordTwo = async () => {
+          const { sig, pcn } = await loadFixture(createRecordTwo);
+
+          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 1 })
+
+          return { sig, pcn };
+        }
+
         it("should result in four records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
           expect(await pcn.searchRecord()).to.have.length(4);
         });
 
         describe("record one", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[0].sys).to.equal(0);
+            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[0].acc).to.equal(0);
           });
         });
 
         describe("record two", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 1, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[1].sys).to.equal(1);
+            expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[1].acc).to.equal(0);
           });
         });
 
         describe("record three", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-          });
-
-          it("should have member address for signer two", async () => {
+          it("sys: 1, mem: 1, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
-          });
 
-          it("should have access one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[2].sys).to.equal(1);
+            expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
             expect((await pcn.searchRecord())[2].acc).to.equal(1);
           });
         });
 
         describe("record four", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[3].sys).to.equal(1);
-          });
-
-          it("should have member address for signer three", async () => {
+          it("sys: 1, mem: 2, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
+
+            expect((await pcn.searchRecord())[3].sys).to.equal(1);
             expect((await pcn.searchRecord())[3].mem).to.equal(sig[2].address);
+            expect((await pcn.searchRecord())[3].acc).to.equal(1);
+          });
+        });
+
+        describe("delete", () => {
+          it("should result in three records", async () => {
+            const { pcn } = await loadFixture(deleteRecordTwo);
+            expect(await pcn.searchRecord()).to.have.length(3);
           });
 
-          it("should have access one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[3].acc).to.equal(1);
+          describe("record one", () => {
+            it("sys: 0, mem: 0, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[0].sys).to.equal(0);
+              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            });
+          });
+
+          describe("record two", () => {
+            it("sys: 1, mem: 0, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[1].sys).to.equal(1);
+              expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
+              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            });
+          });
+
+          describe("record three", () => {
+            it("sys: 1, mem: 1, acc: 1", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[2].sys).to.equal(1);
+              expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
+              expect((await pcn.searchRecord())[2].acc).to.equal(1);
+            });
           });
         });
       });
@@ -1602,76 +1562,93 @@ describe("Policy", () => {
           return { sig, pcn };
         }
 
+        const deleteRecordTwo = async () => {
+          const { sig, pcn } = await loadFixture(createRecordTwo);
+
+          await pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[2].address, acc: 2 })
+
+          return { sig, pcn };
+        }
+
         it("should result in four records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
           expect(await pcn.searchRecord()).to.have.length(4);
         });
 
         describe("record one", () => {
-          it("should have system zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[0].sys).to.equal(0);
+            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[0].acc).to.equal(0);
           });
         });
 
         describe("record two", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-          });
-
-          it("should have member address for signer one", async () => {
+          it("sys: 1, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
-          });
 
-          it("should have access zero", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[1].sys).to.equal(1);
+            expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
             expect((await pcn.searchRecord())[1].acc).to.equal(0);
           });
         });
 
         describe("record three", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-          });
-
-          it("should have member address for signer two", async () => {
+          it("sys: 1, mem: 1, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
-          });
 
-          it("should have access one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
+            expect((await pcn.searchRecord())[2].sys).to.equal(1);
+            expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
             expect((await pcn.searchRecord())[2].acc).to.equal(1);
           });
         });
 
         describe("record four", () => {
-          it("should have system one", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[3].sys).to.equal(1);
-          });
-
-          it("should have member address for signer three", async () => {
+          it("sys: 1, mem: 2, acc: 2", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
+
+            expect((await pcn.searchRecord())[3].sys).to.equal(1);
             expect((await pcn.searchRecord())[3].mem).to.equal(sig[2].address);
+            expect((await pcn.searchRecord())[3].acc).to.equal(2);
+          });
+        });
+
+        describe("delete", () => {
+          it("should result in three records", async () => {
+            const { pcn } = await loadFixture(deleteRecordTwo);
+            expect(await pcn.searchRecord()).to.have.length(3);
           });
 
-          it("should have access two", async () => {
-            const { pcn } = await loadFixture(createRecordTwo);
-            expect((await pcn.searchRecord())[3].acc).to.equal(2);
+          describe("record one", () => {
+            it("sys: 0, mem: 0, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[0].sys).to.equal(0);
+              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
+              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            });
+          });
+
+          describe("record two", () => {
+            it("sys: 1, mem: 0, acc: 0", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[1].sys).to.equal(1);
+              expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
+              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            });
+          });
+
+          describe("record three", () => {
+            it("sys: 1, mem: 1, acc: 1", async () => {
+              const { sig, pcn } = await loadFixture(deleteRecordTwo);
+
+              expect((await pcn.searchRecord())[2].sys).to.equal(1);
+              expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
+              expect((await pcn.searchRecord())[2].acc).to.equal(1);
+            });
           });
         });
       });
