@@ -5,7 +5,7 @@ which is based on the concept of SMAs (system-member-access). SMAs are
 contextual permission records, enforcing flat organizational structures without
 any capability of inheritance.
 
-```Solidity
+```js
 /// @notice System refers to context, resource or scope.
 /// @notice Member refers to account, identity or user.
 /// @notice Access refers to level, permission or role.
