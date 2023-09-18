@@ -4,6 +4,7 @@ import { ethers } from "hardhat";
 
 import { Policy } from "../typechain-types/Policy";
 
+// TODO test events for all cases
 describe("Policy", () => {
   const deployContract = async () => {
     const sig = await ethers.getSigners();
@@ -17,20 +18,26 @@ describe("Policy", () => {
 
   describe("deployment", () => {
     describe("should emit event", () => {
-      describe("Created", () => {
+      describe("SystemCreated", () => {
         it("sys: 0, mem: 0, acc: 0", async () => {
           const { sig, pcn } = await loadFixture(deployContract);
-          await expect(pcn.deploymentTransaction()).to.emit(pcn, "Created").withArgs(0, sig[0].address, 0);
+          await expect(pcn.deploymentTransaction()).to.emit(pcn, "SystemCreated").withArgs(0, sig[0].address, 0);
         });
       });
     });
 
     describe("should not emit event", () => {
-      describe("Deleted", () => {
-        it("sys: 0, mem: 0, acc: 0", async () => {
-          const { pcn } = await loadFixture(deployContract);
-          await expect(pcn.deploymentTransaction()).not.to.emit(pcn, "Deleted");
-        });
+      it("MemberAdded", async () => {
+        const { pcn } = await loadFixture(deployContract);
+        await expect(pcn.deploymentTransaction()).not.to.emit(pcn, "MemberAdded");
+      });
+      it("MemberRemoved", async () => {
+        const { pcn } = await loadFixture(deployContract);
+        await expect(pcn.deploymentTransaction()).not.to.emit(pcn, "MemberRemoved");
+      });
+      it("SystemDeleted", async () => {
+        const { pcn } = await loadFixture(deployContract);
+        await expect(pcn.deploymentTransaction()).not.to.emit(pcn, "SystemDeleted");
       });
     });
 
@@ -79,20 +86,26 @@ describe("Policy", () => {
         }
 
         describe("should emit event", () => {
-          describe("Created", () => {
+          describe("MemberAdded", () => {
             it("sys: 0, mem: 1, acc: 0", async () => {
               const { sig, pcn, tnx } = await loadFixture(createRecord);
-              await expect(tnx).to.emit(pcn, "Created").withArgs(0, sig[1].address, 0);
+              await expect(tnx).to.emit(pcn, "MemberAdded").withArgs(0, sig[1].address, 0);
             });
           });
         });
 
         describe("should not emit event", () => {
-          describe("Deleted", () => {
-            it("sys: 0, mem: 1, acc: 0", async () => {
-              const { pcn, tnx } = await loadFixture(createRecord);
-              await expect(tnx).not.to.emit(pcn, "Deleted");
-            });
+          it("MemberRemoved", async () => {
+            const { pcn, tnx } = await loadFixture(createRecord);
+            await expect(tnx).not.to.emit(pcn, "MemberRemoved");
+          });
+          it("SystemCreated", async () => {
+            const { pcn, tnx } = await loadFixture(createRecord);
+            await expect(tnx).not.to.emit(pcn, "SystemCreated");
+          });
+          it("SystemDeleted", async () => {
+            const { pcn, tnx } = await loadFixture(createRecord);
+            await expect(tnx).not.to.emit(pcn, "SystemDeleted");
           });
         });
 
@@ -132,21 +145,27 @@ describe("Policy", () => {
               return { sig, pcn, tnx };
             }
 
-            describe("should not emit event", () => {
-              describe("Created", () => {
+            describe("should emit event", () => {
+              describe("MemberRemoved", () => {
                 it("sys: 0, mem: 1, acc: 0", async () => {
-                  const { pcn, tnx } = await loadFixture(deleteRecord);
-                  await expect(tnx).not.to.emit(pcn, "Created");
+                  const { sig, pcn, tnx } = await loadFixture(deleteRecord);
+                  await expect(tnx).to.emit(pcn, "MemberRemoved").withArgs(0, sig[1].address, 0);
                 });
               });
             });
 
-            describe("should emit event", () => {
-              describe("Deleted", () => {
-                it("sys: 0, mem: 1, acc: 0", async () => {
-                  const { sig, pcn, tnx } = await loadFixture(deleteRecord);
-                  await expect(tnx).to.emit(pcn, "Deleted").withArgs(0, sig[1].address, 0);;
-                });
+            describe("should not emit event", () => {
+              it("MemberAdded", async () => {
+                const { pcn, tnx } = await loadFixture(deleteRecord);
+                await expect(tnx).not.to.emit(pcn, "MemberAdded");
+              });
+              it("SystemCreated", async () => {
+                const { pcn, tnx } = await loadFixture(deleteRecord);
+                await expect(tnx).not.to.emit(pcn, "SystemCreated");
+              });
+              it("SystemDeleted", async () => {
+                const { pcn, tnx } = await loadFixture(deleteRecord);
+                await expect(tnx).not.to.emit(pcn, "SystemDeleted");
               });
             });
 

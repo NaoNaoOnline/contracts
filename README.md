@@ -11,9 +11,9 @@ any capability of inheritance.
 /// @notice Access refers to level, permission or role.
 ```
 
-SMAs are a form of access control lists or role based access control models. In
-principle there can be many systems with many members who each have a certain
-level of access within their respective systems.
+SMAs are a form of [ACLs] (access control lists) and are similar to [RBAC] (role
+based access control). In principle there can be many systems with many members
+who each have a certain level of access within their respective systems.
 
 Using SMAs, permission models can be bootstrapped and managed onchain. And since
 those permissions are onchain, they are out of band from the point of view of
@@ -34,3 +34,8 @@ npm run test
 ```
 import "hardhat/console.sol";
 ```
+
+
+
+[ACLs]: https://en.wikipedia.org/wiki/Access-control_list
+[RBAC]: https://en.wikipedia.org/wiki/Role-based_access_control
