@@ -199,6 +199,7 @@ contract Policy {
         //     The member to be added must become access zero.
         //
         if (!dse && czz && maz) {
+            // create system
             return true;
         }
 
@@ -212,6 +213,7 @@ contract Policy {
         //     The caller must not add themselves.
         //
         if (dse && !dme && dce && chp && !cim) {
+            // add member
             return true;
         }
 
@@ -223,6 +225,7 @@ contract Policy {
         //     The caller must add themselves.
         //
         if (dse && czz && !dme && cim) {
+            // add member
             return true;
         }
 
@@ -289,6 +292,7 @@ contract Policy {
         //     The caller must remove themselves.
         //
         if (dre && !czz && !saz && cim) {
+            // remove member
             return true;
         }
 
@@ -303,6 +307,7 @@ contract Policy {
         //     The caller must not remove themselves.
         //
         if (dre && dse && dme && dce && chp && !cim) {
+            // remove member
             return true;
         }
 
@@ -315,12 +320,29 @@ contract Policy {
         //     The caller must not remove themselves.
         //
         if (dre && dse && dme && czz && !cim) {
+            // remove member
+            return true;
+        }
+
+        // Access zero in any given system can be removed from that system by
+        // access zero, if that system has many access zero members. Removal can
+        // happen by others, or be self serving.
+        //
+        //     The record to remove must exist as given.
+        //     The system to remove the member from must exist.
+        //     The member to remove must exist in that system.
+        //     The member to remove must have access zero in that system.
+        //     The system must have many access zero members.
+        //     The caller must have equal or higher access in that system.
+        //
+        if (dre && dse && dme && saz && maz && chp) {
+            // remove member
             return true;
         }
 
         // Access zero in any given system can remove themselves from that
-        // system, if that system is not system zero and delete that system in
-        // the process.
+        // system and delete that system in the process, if that system is not
+        // system zero.
         //
         //     The record to remove must exist as given.
         //     The system to remove the member from must exist.
@@ -332,20 +354,6 @@ contract Policy {
         //
         if (dre && dse && dme && saz && oom && rec.sys != 0 && cim) {
             // delete system
-            return true;
-        }
-
-        // Access zero in any given system can be removed from that system by
-        // access zero, if that system has many access zero members.
-        //
-        //     The record to remove must exist as given.
-        //     The system to remove the member from must exist.
-        //     The member to remove must exist in that system.
-        //     The member to remove must have access zero in that system.
-        //     The system must have many access zero members.
-        //     The caller must have equal or higher access in that system.
-        //
-        if (dre && dse && dme && saz && maz && chp) {
             return true;
         }
 
