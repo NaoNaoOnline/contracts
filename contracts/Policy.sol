@@ -21,15 +21,29 @@ contract Policy {
     /// EVENTS
     ///
 
-    /// @notice TODO
-    event Created(
+    /// @notice CreateMember is emitted when a member is created within a system.
+    event CreateMember(
         uint256 indexed sys,
         address indexed mem,
         uint256 indexed acc
     );
 
-    /// @notice TODO
-    event Deleted(
+    /// @notice DeleteMember is emitted when a member is deleted within a system.
+    event DeleteMember(
+        uint256 indexed sys,
+        address indexed mem,
+        uint256 indexed acc
+    );
+
+    /// @notice CreateSystem is emitted when a system is created.
+    event CreateSystem(
+        uint256 indexed sys,
+        address indexed mem,
+        uint256 indexed acc
+    );
+
+    /// @notice DeleteSystem is emitted when a system is deleted.
+    event DeleteSystem(
         uint256 indexed sys,
         address indexed mem,
         uint256 indexed acc
@@ -54,7 +68,7 @@ contract Policy {
 
     /// @notice constructor for initializing an instance of the Policy contract.
     /// @notice Creates first record for the deployer address with access zero in system zero.
-    /// @notice Emits Created for the added record.
+    /// @notice Emits CreateSystem.
     /// @param amo the optional maximum amount of records returned in a single call to searchRecord.
     /// @param amo must be greater than 0 and smaller or equal to 1000.
     /// @param amo defaults to 100 otherwise.
@@ -67,7 +81,7 @@ contract Policy {
 
         _blocks = block.number;
         _states._createRecord(Triple.Record({sys: 0, mem: msg.sender, acc: 0}));
-        emit Created(0, msg.sender, 0);
+        emit CreateSystem(0, msg.sender, 0);
     }
 
     ///
@@ -76,7 +90,7 @@ contract Policy {
 
     /// @notice createRecord allows privileged members to add records onchain.
     /// @notice Reverts on unprivileged access.
-    /// @notice Emits Created for the added record.
+    /// @notice Emits CreateSystem or CreateMember via _createRecord.
     /// @param rec the record to create.
     function createRecord(Triple.Record memory rec) public {
         if (!_verifyCreate(rec)) {
@@ -86,13 +100,12 @@ contract Policy {
         {
             _blocks = block.number;
             _states._createRecord(rec);
-            emit Created(rec.sys, rec.mem, rec.acc);
         }
     }
 
     /// @notice deleteRecord allows privileged members to remove records onchain.
     /// @notice Reverts on unprivileged access.
-    /// @notice Emits Deleted for the removed record.
+    /// @notice Emits DeleteSystem or DeleteMember via _deleteRecord.
     /// @param rec the record to delete.
     function deleteRecord(Triple.Record memory rec) public {
         if (!_verifyDelete(rec)) {
@@ -102,7 +115,6 @@ contract Policy {
         {
             _blocks = block.number;
             _states._deleteRecord(rec);
-            emit Deleted(rec.sys, rec.mem, rec.acc);
         }
     }
 
@@ -156,10 +168,11 @@ contract Policy {
     /// INTERNAL
     ///
 
-    /// @notice _verifyCreate expresses whether adding the given record is allowed.
-    function _verifyCreate(
-        Triple.Record memory rec
-    ) internal view returns (bool) {
+    /// @notice _verifyCreate expresses whether the given record is allowed to be created.
+    /// @notice Emits CreateSystem or CreateMember.
+    /// @param rec the record to create.
+    /// @return bool true if the given record can be created, otherwise false.
+    function _verifyCreate(Triple.Record memory rec) internal returns (bool) {
         // cim, caller is member, expresses whether the given member is
         // msg.sender. In this context, that means the caller adds
         // themselves.
@@ -199,7 +212,7 @@ contract Policy {
         //     The member to be added must become access zero.
         //
         if (!dse && czz && maz) {
-            // create system
+            emit CreateSystem(rec.sys, rec.mem, rec.acc);
             return true;
         }
 
@@ -213,7 +226,7 @@ contract Policy {
         //     The caller must not add themselves.
         //
         if (dse && !dme && dce && chp && !cim) {
-            // add member
+            emit CreateMember(rec.sys, rec.mem, rec.acc);
             return true;
         }
 
@@ -225,17 +238,18 @@ contract Policy {
         //     The caller must add themselves.
         //
         if (dse && czz && !dme && cim) {
-            // add member
+            emit CreateMember(rec.sys, rec.mem, rec.acc);
             return true;
         }
 
         return false;
     }
 
-    /// @notice _verifyDelete expresses whether removing the given record is allowed.
-    function _verifyDelete(
-        Triple.Record memory rec
-    ) internal view returns (bool) {
+    /// @notice _verifyDelete expresses whether the given record is allowed to be deleted.
+    /// @notice Emits DeleteSystem or DeleteMember.
+    /// @param rec the record to delete.
+    /// @return bool true if the given record can be deleted, otherwise false.
+    function _verifyDelete(Triple.Record memory rec) internal returns (bool) {
         // cim, caller is member, expresses whether the given member is
         // msg.sender. In this context, that means the caller removes
         // themselves.
@@ -292,7 +306,7 @@ contract Policy {
         //     The caller must remove themselves.
         //
         if (dre && !czz && !saz && cim) {
-            // remove member
+            emit DeleteMember(rec.sys, rec.mem, rec.acc);
             return true;
         }
 
@@ -307,7 +321,7 @@ contract Policy {
         //     The caller must not remove themselves.
         //
         if (dre && dse && dme && dce && chp && !cim) {
-            // remove member
+            emit DeleteMember(rec.sys, rec.mem, rec.acc);
             return true;
         }
 
@@ -320,7 +334,7 @@ contract Policy {
         //     The caller must not remove themselves.
         //
         if (dre && dse && dme && czz && !cim) {
-            // remove member
+            emit DeleteMember(rec.sys, rec.mem, rec.acc);
             return true;
         }
 
@@ -336,7 +350,7 @@ contract Policy {
         //     The caller must have equal or higher access in that system.
         //
         if (dre && dse && dme && saz && maz && chp) {
-            // remove member
+            emit DeleteMember(rec.sys, rec.mem, rec.acc);
             return true;
         }
 
@@ -353,7 +367,7 @@ contract Policy {
         //     The caller must remove themselves.
         //
         if (dre && dse && dme && saz && oom && rec.sys != 0 && cim) {
-            // delete system
+            emit DeleteSystem(rec.sys, rec.mem, rec.acc);
             return true;
         }
 
