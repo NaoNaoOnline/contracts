@@ -115,7 +115,7 @@ contract Policy {
         return _amount;
     }
 
-    /// @notice searchBlocks returns the block height of the last state change.
+    /// @notice searchBlocks returns the block height of the last internal state change.
     function searchBlocks() public view returns (uint256) {
         return _blocks;
     }
