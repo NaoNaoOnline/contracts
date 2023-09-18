@@ -2,11 +2,15 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
+import { Policy } from "../typechain-types/Policy";
+
 describe("Policy", () => {
   const deployContract = async () => {
     const sig = await ethers.getSigners();
 
-    const pcn = await (await ethers.getContractFactory("Policy")).deploy();
+    const tcn = await (await ethers.getContractFactory("Triple")).deploy();
+    // TODO test searchRecord iterations
+    const pcn = await (await ethers.getContractFactory("Policy", { libraries: { Triple: await tcn.getAddress() } })).deploy(0);
 
     return { sig, pcn };
   }
@@ -32,16 +36,16 @@ describe("Policy", () => {
 
     it("should result in one record", async () => {
       const { pcn } = await loadFixture(deployContract);
-      expect(await pcn.searchRecord()).to.have.length(1);
+      expect(await searchRecord(pcn)).to.have.length(1);
     });
 
     describe("record one", () => {
       it("sys: 0, mem: 0, acc: 0", async () => {
         const { sig, pcn } = await loadFixture(deployContract);
 
-        expect((await pcn.searchRecord())[0].sys).to.equal(0);
-        expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-        expect((await pcn.searchRecord())[0].acc).to.equal(0);
+        expect((await searchRecord(pcn))[0].sys).to.equal(0);
+        expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+        expect((await searchRecord(pcn))[0].acc).to.equal(0);
       });
     });
   });
@@ -94,16 +98,16 @@ describe("Policy", () => {
 
         it("should result in two records", async () => {
           const { pcn } = await loadFixture(createRecord);
-          expect(await pcn.searchRecord()).to.have.length(2);
+          expect(await searchRecord(pcn)).to.have.length(2);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
 
@@ -111,9 +115,9 @@ describe("Policy", () => {
           it("sys: 0, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
 
-            expect((await pcn.searchRecord())[1].sys).to.equal(0);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-            expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            expect((await searchRecord(pcn))[1].sys).to.equal(0);
+            expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+            expect((await searchRecord(pcn))[1].acc).to.equal(0);
           });
         });
 
@@ -148,16 +152,16 @@ describe("Policy", () => {
 
             it("should result in one record", async () => {
               const { pcn } = await loadFixture(deleteRecord);
-              expect(await pcn.searchRecord()).to.have.length(1);
+              expect(await searchRecord(pcn)).to.have.length(1);
             });
 
             describe("record one", () => {
               it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecord);
 
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+                expect((await searchRecord(pcn))[0].acc).to.equal(0);
               });
             });
           });
@@ -173,16 +177,16 @@ describe("Policy", () => {
 
             it("should result in one record", async () => {
               const { pcn } = await loadFixture(deleteRecord);
-              expect(await pcn.searchRecord()).to.have.length(1);
+              expect(await searchRecord(pcn)).to.have.length(1);
             });
 
             describe("record one", () => {
               it("sys: 0, mem: 1, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecord);
 
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[1].address);
-                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                expect((await searchRecord(pcn))[0].mem).to.equal(sig[1].address);
+                expect((await searchRecord(pcn))[0].acc).to.equal(0);
               });
             });
           });
@@ -201,16 +205,16 @@ describe("Policy", () => {
 
               it("should result in one record", async () => {
                 const { pcn } = await loadFixture(deleteRecord);
-                expect(await pcn.searchRecord()).to.have.length(1);
+                expect(await searchRecord(pcn)).to.have.length(1);
               });
 
               describe("record one", () => {
                 it("sys: 0, mem: 1, acc: 0", async () => {
                   const { sig, pcn } = await loadFixture(deleteRecord);
 
-                  expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                  expect((await pcn.searchRecord())[0].mem).to.equal(sig[1].address);
-                  expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                  expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                  expect((await searchRecord(pcn))[0].mem).to.equal(sig[1].address);
+                  expect((await searchRecord(pcn))[0].acc).to.equal(0);
                 });
               });
             });
@@ -229,16 +233,16 @@ describe("Policy", () => {
 
         it("should result in two records", async () => {
           const { pcn } = await loadFixture(createRecord);
-          expect(await pcn.searchRecord()).to.have.length(2);
+          expect(await searchRecord(pcn)).to.have.length(2);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
 
@@ -246,9 +250,9 @@ describe("Policy", () => {
           it("sys: 0, mem: 1, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
 
-            expect((await pcn.searchRecord())[1].sys).to.equal(0);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-            expect((await pcn.searchRecord())[1].acc).to.equal(1);
+            expect((await searchRecord(pcn))[1].sys).to.equal(0);
+            expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+            expect((await searchRecord(pcn))[1].acc).to.equal(1);
           });
         });
 
@@ -265,16 +269,16 @@ describe("Policy", () => {
             describe("sys: 0, mem: 1, acc: 1", () => {
               it("should result in one record", async () => {
                 const { pcn } = await loadFixture(deleteRecord);
-                expect(await pcn.searchRecord()).to.have.length(1);
+                expect(await searchRecord(pcn)).to.have.length(1);
               });
 
               describe("record one", () => {
                 it("sys: 0, mem: 0, acc: 0", async () => {
                   const { sig, pcn } = await loadFixture(deleteRecord);
 
-                  expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                  expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                  expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                  expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                  expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+                  expect((await searchRecord(pcn))[0].acc).to.equal(0);
                 });
               });
             });
@@ -293,16 +297,16 @@ describe("Policy", () => {
 
         it("should result in two records", async () => {
           const { pcn } = await loadFixture(createRecord);
-          expect(await pcn.searchRecord()).to.have.length(2);
+          expect(await searchRecord(pcn)).to.have.length(2);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
 
@@ -310,9 +314,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
 
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            expect((await searchRecord(pcn))[1].sys).to.equal(1);
+            expect((await searchRecord(pcn))[1].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[1].acc).to.equal(0);
           });
         });
 
@@ -329,16 +333,16 @@ describe("Policy", () => {
             describe("sys: 1, mem: 0, acc: 0", () => {
               it("should result in one record", async () => {
                 const { pcn } = await loadFixture(deleteRecord);
-                expect(await pcn.searchRecord()).to.have.length(1);
+                expect(await searchRecord(pcn)).to.have.length(1);
               });
 
               describe("record one", () => {
                 it("sys: 0, mem: 0, acc: 0", async () => {
                   const { sig, pcn } = await loadFixture(deleteRecord);
 
-                  expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                  expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                  expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                  expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                  expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+                  expect((await searchRecord(pcn))[0].acc).to.equal(0);
                 });
               });
             });
@@ -365,16 +369,16 @@ describe("Policy", () => {
 
         it("should result in two records", async () => {
           const { pcn } = await loadFixture(createRecord);
-          expect(await pcn.searchRecord()).to.have.length(2);
+          expect(await searchRecord(pcn)).to.have.length(2);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
 
@@ -382,9 +386,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
 
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-            expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            expect((await searchRecord(pcn))[1].sys).to.equal(1);
+            expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+            expect((await searchRecord(pcn))[1].acc).to.equal(0);
           });
         });
 
@@ -400,16 +404,16 @@ describe("Policy", () => {
 
             it("should result in one record", async () => {
               const { pcn } = await loadFixture(deleteRecord);
-              expect(await pcn.searchRecord()).to.have.length(1);
+              expect(await searchRecord(pcn)).to.have.length(1);
             });
 
             describe("record one", () => {
               it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecord);
 
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+                expect((await searchRecord(pcn))[0].acc).to.equal(0);
               });
             });
           });
@@ -437,16 +441,16 @@ describe("Policy", () => {
 
         it("should result in four records", async () => {
           const { pcn } = await loadFixture(createRecord);
-          expect(await pcn.searchRecord()).to.have.length(4);
+          expect(await searchRecord(pcn)).to.have.length(4);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
 
@@ -454,9 +458,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
 
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            expect((await searchRecord(pcn))[1].sys).to.equal(1);
+            expect((await searchRecord(pcn))[1].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[1].acc).to.equal(0);
           });
         });
 
@@ -464,9 +468,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 1, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
 
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-            expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
-            expect((await pcn.searchRecord())[2].acc).to.equal(1);
+            expect((await searchRecord(pcn))[2].sys).to.equal(1);
+            expect((await searchRecord(pcn))[2].mem).to.equal(sig[1].address);
+            expect((await searchRecord(pcn))[2].acc).to.equal(1);
           });
         });
 
@@ -474,9 +478,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 2, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecord);
 
-            expect((await pcn.searchRecord())[3].sys).to.equal(1);
-            expect((await pcn.searchRecord())[3].mem).to.equal(sig[2].address);
-            expect((await pcn.searchRecord())[3].acc).to.equal(1);
+            expect((await searchRecord(pcn))[3].sys).to.equal(1);
+            expect((await searchRecord(pcn))[3].mem).to.equal(sig[2].address);
+            expect((await searchRecord(pcn))[3].acc).to.equal(1);
           });
         });
 
@@ -493,16 +497,16 @@ describe("Policy", () => {
 
             it("should result in two records", async () => {
               const { pcn } = await loadFixture(deleteRecord);
-              expect(await pcn.searchRecord()).to.have.length(2);
+              expect(await searchRecord(pcn)).to.have.length(2);
             });
 
             describe("record one", () => {
               it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecord);
 
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+                expect((await searchRecord(pcn))[0].acc).to.equal(0);
               });
             });
 
@@ -510,9 +514,9 @@ describe("Policy", () => {
               it("sys: 1, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecord);
 
-                expect((await pcn.searchRecord())[1].sys).to.equal(1);
-                expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await searchRecord(pcn))[1].sys).to.equal(1);
+                expect((await searchRecord(pcn))[1].mem).to.equal(sig[0].address);
+                expect((await searchRecord(pcn))[1].acc).to.equal(0);
               });
             });
           });
@@ -682,16 +686,16 @@ describe("Policy", () => {
 
         it("should result in one record", async () => {
           const { pcn } = await loadFixture(deleteRecord);
-          expect(await pcn.searchRecord()).to.have.length(1);
+          expect(await searchRecord(pcn)).to.have.length(1);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(deleteRecord);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
       });
@@ -855,16 +859,16 @@ describe("Policy", () => {
 
         it("should result in three records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
-          expect(await pcn.searchRecord()).to.have.length(3);
+          expect(await searchRecord(pcn)).to.have.length(3);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
 
@@ -872,9 +876,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-            expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            expect((await searchRecord(pcn))[1].sys).to.equal(1);
+            expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+            expect((await searchRecord(pcn))[1].acc).to.equal(0);
           });
         });
 
@@ -882,9 +886,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-            expect((await pcn.searchRecord())[2].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[2].acc).to.equal(0);
+            expect((await searchRecord(pcn))[2].sys).to.equal(1);
+            expect((await searchRecord(pcn))[2].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[2].acc).to.equal(0);
           });
         });
 
@@ -900,16 +904,16 @@ describe("Policy", () => {
 
             it("should result in two records", async () => {
               const { pcn } = await loadFixture(deleteRecordTwo);
-              expect(await pcn.searchRecord()).to.have.length(2);
+              expect(await searchRecord(pcn)).to.have.length(2);
             });
 
             describe("record one", () => {
               it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+                expect((await searchRecord(pcn))[0].acc).to.equal(0);
               });
             });
 
@@ -917,9 +921,9 @@ describe("Policy", () => {
               it("sys: 1, mem: 1, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[1].sys).to.equal(1);
-                expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await searchRecord(pcn))[1].sys).to.equal(1);
+                expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+                expect((await searchRecord(pcn))[1].acc).to.equal(0);
               });
             });
           });
@@ -937,16 +941,16 @@ describe("Policy", () => {
 
         it("should result in three records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
-          expect(await pcn.searchRecord()).to.have.length(3);
+          expect(await searchRecord(pcn)).to.have.length(3);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
 
@@ -954,9 +958,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-            expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            expect((await searchRecord(pcn))[1].sys).to.equal(1);
+            expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+            expect((await searchRecord(pcn))[1].acc).to.equal(0);
           });
         });
 
@@ -964,9 +968,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 0, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-            expect((await pcn.searchRecord())[2].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[2].acc).to.equal(1);
+            expect((await searchRecord(pcn))[2].sys).to.equal(1);
+            expect((await searchRecord(pcn))[2].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[2].acc).to.equal(1);
           });
         });
 
@@ -982,16 +986,16 @@ describe("Policy", () => {
 
             it("should result in two records", async () => {
               const { pcn } = await loadFixture(deleteRecordTwo);
-              expect(await pcn.searchRecord()).to.have.length(2);
+              expect(await searchRecord(pcn)).to.have.length(2);
             });
 
             describe("record one", () => {
               it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+                expect((await searchRecord(pcn))[0].acc).to.equal(0);
               });
             });
 
@@ -999,9 +1003,9 @@ describe("Policy", () => {
               it("sys: 1, mem: 1, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[1].sys).to.equal(1);
-                expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await searchRecord(pcn))[1].sys).to.equal(1);
+                expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+                expect((await searchRecord(pcn))[1].acc).to.equal(0);
               });
             });
           });
@@ -1019,16 +1023,16 @@ describe("Policy", () => {
 
         it("should result in three records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
-          expect(await pcn.searchRecord()).to.have.length(3);
+          expect(await searchRecord(pcn)).to.have.length(3);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
 
@@ -1036,9 +1040,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-            expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            expect((await searchRecord(pcn))[1].sys).to.equal(1);
+            expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+            expect((await searchRecord(pcn))[1].acc).to.equal(0);
           });
         });
 
@@ -1046,9 +1050,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 0, acc: 2", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-            expect((await pcn.searchRecord())[2].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[2].acc).to.equal(2);
+            expect((await searchRecord(pcn))[2].sys).to.equal(1);
+            expect((await searchRecord(pcn))[2].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[2].acc).to.equal(2);
           });
         });
 
@@ -1064,16 +1068,16 @@ describe("Policy", () => {
 
             it("should result in two records", async () => {
               const { pcn } = await loadFixture(deleteRecordTwo);
-              expect(await pcn.searchRecord()).to.have.length(2);
+              expect(await searchRecord(pcn)).to.have.length(2);
             });
 
             describe("record one", () => {
               it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+                expect((await searchRecord(pcn))[0].acc).to.equal(0);
               });
             });
 
@@ -1081,9 +1085,9 @@ describe("Policy", () => {
               it("sys: 1, mem: 1, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[1].sys).to.equal(1);
-                expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await searchRecord(pcn))[1].sys).to.equal(1);
+                expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+                expect((await searchRecord(pcn))[1].acc).to.equal(0);
               });
             });
           });
@@ -1125,16 +1129,16 @@ describe("Policy", () => {
 
         it("should result in three records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
-          expect(await pcn.searchRecord()).to.have.length(3);
+          expect(await searchRecord(pcn)).to.have.length(3);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
 
@@ -1142,9 +1146,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-            expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            expect((await searchRecord(pcn))[1].sys).to.equal(1);
+            expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+            expect((await searchRecord(pcn))[1].acc).to.equal(0);
           });
         });
 
@@ -1152,9 +1156,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 2, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-            expect((await pcn.searchRecord())[2].mem).to.equal(sig[2].address);
-            expect((await pcn.searchRecord())[2].acc).to.equal(0);
+            expect((await searchRecord(pcn))[2].sys).to.equal(1);
+            expect((await searchRecord(pcn))[2].mem).to.equal(sig[2].address);
+            expect((await searchRecord(pcn))[2].acc).to.equal(0);
           });
         });
 
@@ -1170,16 +1174,16 @@ describe("Policy", () => {
 
             it("should result in two records", async () => {
               const { pcn } = await loadFixture(deleteRecordTwo);
-              expect(await pcn.searchRecord()).to.have.length(2);
+              expect(await searchRecord(pcn)).to.have.length(2);
             });
 
             describe("record one", () => {
               it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+                expect((await searchRecord(pcn))[0].acc).to.equal(0);
               });
             });
 
@@ -1187,9 +1191,9 @@ describe("Policy", () => {
               it("sys: 1, mem: 1, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[1].sys).to.equal(1);
-                expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await searchRecord(pcn))[1].sys).to.equal(1);
+                expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+                expect((await searchRecord(pcn))[1].acc).to.equal(0);
               });
             });
           });
@@ -1207,16 +1211,16 @@ describe("Policy", () => {
 
         it("should result in three records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
-          expect(await pcn.searchRecord()).to.have.length(3);
+          expect(await searchRecord(pcn)).to.have.length(3);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
 
@@ -1224,9 +1228,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-            expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            expect((await searchRecord(pcn))[1].sys).to.equal(1);
+            expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+            expect((await searchRecord(pcn))[1].acc).to.equal(0);
           });
         });
 
@@ -1234,9 +1238,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 2, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-            expect((await pcn.searchRecord())[2].mem).to.equal(sig[2].address);
-            expect((await pcn.searchRecord())[2].acc).to.equal(1);
+            expect((await searchRecord(pcn))[2].sys).to.equal(1);
+            expect((await searchRecord(pcn))[2].mem).to.equal(sig[2].address);
+            expect((await searchRecord(pcn))[2].acc).to.equal(1);
           });
         });
 
@@ -1252,16 +1256,16 @@ describe("Policy", () => {
 
             it("should result in two records", async () => {
               const { pcn } = await loadFixture(deleteRecordTwo);
-              expect(await pcn.searchRecord()).to.have.length(2);
+              expect(await searchRecord(pcn)).to.have.length(2);
             });
 
             describe("record one", () => {
               it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+                expect((await searchRecord(pcn))[0].acc).to.equal(0);
               });
             });
 
@@ -1269,9 +1273,21 @@ describe("Policy", () => {
               it("sys: 1, mem: 1, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[1].sys).to.equal(1);
-                expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await searchRecord(pcn))[1].sys).to.equal(1);
+                expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+                expect((await searchRecord(pcn))[1].acc).to.equal(0);
+              });
+            });
+          });
+        });
+
+        describe("sys: 1, mem: 1, acc: 0", () => {
+          describe("delete", () => {
+            describe("sys: 1, mem: 1, acc: 0", () => {
+              it("should revert", async () => {
+                const { sig, pcn } = await loadFixture(createRecordTwo);
+                const tnx = pcn.connect(sig[1]).deleteRecord({ sys: 1, mem: sig[1].address, acc: 0 })
+                await expect(tnx).to.be.revertedWithoutReason();
               });
             });
           });
@@ -1289,16 +1305,16 @@ describe("Policy", () => {
 
         it("should result in three records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
-          expect(await pcn.searchRecord()).to.have.length(3);
+          expect(await searchRecord(pcn)).to.have.length(3);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
 
@@ -1306,9 +1322,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 1, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-            expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            expect((await searchRecord(pcn))[1].sys).to.equal(1);
+            expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+            expect((await searchRecord(pcn))[1].acc).to.equal(0);
           });
         });
 
@@ -1316,9 +1332,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 2, acc: 2", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-            expect((await pcn.searchRecord())[2].mem).to.equal(sig[2].address);
-            expect((await pcn.searchRecord())[2].acc).to.equal(2);
+            expect((await searchRecord(pcn))[2].sys).to.equal(1);
+            expect((await searchRecord(pcn))[2].mem).to.equal(sig[2].address);
+            expect((await searchRecord(pcn))[2].acc).to.equal(2);
           });
         });
 
@@ -1334,16 +1350,16 @@ describe("Policy", () => {
 
             it("should result in two records", async () => {
               const { pcn } = await loadFixture(deleteRecordTwo);
-              expect(await pcn.searchRecord()).to.have.length(2);
+              expect(await searchRecord(pcn)).to.have.length(2);
             });
 
             describe("record one", () => {
               it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+                expect((await searchRecord(pcn))[0].acc).to.equal(0);
               });
             });
 
@@ -1351,9 +1367,9 @@ describe("Policy", () => {
               it("sys: 1, mem: 1, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[1].sys).to.equal(1);
-                expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await searchRecord(pcn))[1].sys).to.equal(1);
+                expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+                expect((await searchRecord(pcn))[1].acc).to.equal(0);
               });
             });
           });
@@ -1541,16 +1557,16 @@ describe("Policy", () => {
 
         it("should result in one record", async () => {
           const { pcn } = await loadFixture(deleteRecord);
-          expect(await pcn.searchRecord()).to.have.length(1);
+          expect(await searchRecord(pcn)).to.have.length(1);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(deleteRecord);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
       });
@@ -1681,16 +1697,16 @@ describe("Policy", () => {
 
           it("should result in three records", async () => {
             const { pcn } = await loadFixture(createRecordTwo);
-            expect(await pcn.searchRecord()).to.have.length(3);
+            expect(await searchRecord(pcn)).to.have.length(3);
           });
 
           describe("record one", () => {
             it("sys: 0, mem: 0, acc: 0", async () => {
               const { sig, pcn } = await loadFixture(createRecordTwo);
 
-              expect((await pcn.searchRecord())[0].sys).to.equal(0);
-              expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-              expect((await pcn.searchRecord())[0].acc).to.equal(0);
+              expect((await searchRecord(pcn))[0].sys).to.equal(0);
+              expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+              expect((await searchRecord(pcn))[0].acc).to.equal(0);
             });
           });
 
@@ -1698,9 +1714,9 @@ describe("Policy", () => {
             it("sys: 1, mem: 1, acc: 0", async () => {
               const { sig, pcn } = await loadFixture(createRecordTwo);
 
-              expect((await pcn.searchRecord())[1].sys).to.equal(1);
-              expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-              expect((await pcn.searchRecord())[1].acc).to.equal(0);
+              expect((await searchRecord(pcn))[1].sys).to.equal(1);
+              expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+              expect((await searchRecord(pcn))[1].acc).to.equal(0);
             });
           });
 
@@ -1708,9 +1724,9 @@ describe("Policy", () => {
             it("sys: 1, mem: 0, acc: 0", async () => {
               const { sig, pcn } = await loadFixture(createRecordTwo);
 
-              expect((await pcn.searchRecord())[2].sys).to.equal(1);
-              expect((await pcn.searchRecord())[2].mem).to.equal(sig[0].address);
-              expect((await pcn.searchRecord())[2].acc).to.equal(0);
+              expect((await searchRecord(pcn))[2].sys).to.equal(1);
+              expect((await searchRecord(pcn))[2].mem).to.equal(sig[0].address);
+              expect((await searchRecord(pcn))[2].acc).to.equal(0);
             });
           });
 
@@ -1726,16 +1742,16 @@ describe("Policy", () => {
 
               it("should result in two records", async () => {
                 const { pcn } = await loadFixture(deleteRecordTwo);
-                expect(await pcn.searchRecord()).to.have.length(2);
+                expect(await searchRecord(pcn)).to.have.length(2);
               });
 
               describe("record one", () => {
                 it("sys: 0, mem: 0, acc: 0", async () => {
                   const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                  expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                  expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                  expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                  expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                  expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+                  expect((await searchRecord(pcn))[0].acc).to.equal(0);
                 });
               });
 
@@ -1743,9 +1759,9 @@ describe("Policy", () => {
                 it("sys: 1, mem: 1, acc: 0", async () => {
                   const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                  expect((await pcn.searchRecord())[1].sys).to.equal(1);
-                  expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-                  expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                  expect((await searchRecord(pcn))[1].sys).to.equal(1);
+                  expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+                  expect((await searchRecord(pcn))[1].acc).to.equal(0);
                 });
               });
             });
@@ -1764,16 +1780,16 @@ describe("Policy", () => {
 
                 it("should result in two records", async () => {
                   const { pcn } = await loadFixture(deleteRecordTwo);
-                  expect(await pcn.searchRecord()).to.have.length(2);
+                  expect(await searchRecord(pcn)).to.have.length(2);
                 });
 
                 describe("record one", () => {
                   it("sys: 0, mem: 0, acc: 0", async () => {
                     const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                    expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                    expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                    expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                    expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                    expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+                    expect((await searchRecord(pcn))[0].acc).to.equal(0);
                   });
                 });
 
@@ -1781,9 +1797,9 @@ describe("Policy", () => {
                   it("sys: 1, mem: 1, acc: 0", async () => {
                     const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                    expect((await pcn.searchRecord())[1].sys).to.equal(1);
-                    expect((await pcn.searchRecord())[1].mem).to.equal(sig[1].address);
-                    expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                    expect((await searchRecord(pcn))[1].sys).to.equal(1);
+                    expect((await searchRecord(pcn))[1].mem).to.equal(sig[1].address);
+                    expect((await searchRecord(pcn))[1].acc).to.equal(0);
                   });
                 });
               });
@@ -1944,16 +1960,16 @@ describe("Policy", () => {
 
         it("should result in four records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
-          expect(await pcn.searchRecord()).to.have.length(4);
+          expect(await searchRecord(pcn)).to.have.length(4);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
 
@@ -1961,9 +1977,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            expect((await searchRecord(pcn))[1].sys).to.equal(1);
+            expect((await searchRecord(pcn))[1].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[1].acc).to.equal(0);
           });
         });
 
@@ -1971,9 +1987,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 1, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-            expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
-            expect((await pcn.searchRecord())[2].acc).to.equal(1);
+            expect((await searchRecord(pcn))[2].sys).to.equal(1);
+            expect((await searchRecord(pcn))[2].mem).to.equal(sig[1].address);
+            expect((await searchRecord(pcn))[2].acc).to.equal(1);
           });
         });
 
@@ -1981,9 +1997,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 2, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[3].sys).to.equal(1);
-            expect((await pcn.searchRecord())[3].mem).to.equal(sig[2].address);
-            expect((await pcn.searchRecord())[3].acc).to.equal(1);
+            expect((await searchRecord(pcn))[3].sys).to.equal(1);
+            expect((await searchRecord(pcn))[3].mem).to.equal(sig[2].address);
+            expect((await searchRecord(pcn))[3].acc).to.equal(1);
           });
         });
 
@@ -1999,16 +2015,16 @@ describe("Policy", () => {
 
             it("should result in three records", async () => {
               const { pcn } = await loadFixture(deleteRecordTwo);
-              expect(await pcn.searchRecord()).to.have.length(3);
+              expect(await searchRecord(pcn)).to.have.length(3);
             });
 
             describe("record one", () => {
               it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+                expect((await searchRecord(pcn))[0].acc).to.equal(0);
               });
             });
 
@@ -2016,9 +2032,9 @@ describe("Policy", () => {
               it("sys: 1, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[1].sys).to.equal(1);
-                expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await searchRecord(pcn))[1].sys).to.equal(1);
+                expect((await searchRecord(pcn))[1].mem).to.equal(sig[0].address);
+                expect((await searchRecord(pcn))[1].acc).to.equal(0);
               });
             });
 
@@ -2026,9 +2042,9 @@ describe("Policy", () => {
               it("sys: 1, mem: 1, acc: 1", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[2].sys).to.equal(1);
-                expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
-                expect((await pcn.searchRecord())[2].acc).to.equal(1);
+                expect((await searchRecord(pcn))[2].sys).to.equal(1);
+                expect((await searchRecord(pcn))[2].mem).to.equal(sig[1].address);
+                expect((await searchRecord(pcn))[2].acc).to.equal(1);
               });
             });
           });
@@ -2046,16 +2062,16 @@ describe("Policy", () => {
 
         it("should result in four records", async () => {
           const { pcn } = await loadFixture(createRecordTwo);
-          expect(await pcn.searchRecord()).to.have.length(4);
+          expect(await searchRecord(pcn)).to.have.length(4);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
 
@@ -2063,9 +2079,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            expect((await searchRecord(pcn))[1].sys).to.equal(1);
+            expect((await searchRecord(pcn))[1].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[1].acc).to.equal(0);
           });
         });
 
@@ -2073,9 +2089,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 1, acc: 1", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[2].sys).to.equal(1);
-            expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
-            expect((await pcn.searchRecord())[2].acc).to.equal(1);
+            expect((await searchRecord(pcn))[2].sys).to.equal(1);
+            expect((await searchRecord(pcn))[2].mem).to.equal(sig[1].address);
+            expect((await searchRecord(pcn))[2].acc).to.equal(1);
           });
         });
 
@@ -2083,9 +2099,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 2, acc: 2", async () => {
             const { sig, pcn } = await loadFixture(createRecordTwo);
 
-            expect((await pcn.searchRecord())[3].sys).to.equal(1);
-            expect((await pcn.searchRecord())[3].mem).to.equal(sig[2].address);
-            expect((await pcn.searchRecord())[3].acc).to.equal(2);
+            expect((await searchRecord(pcn))[3].sys).to.equal(1);
+            expect((await searchRecord(pcn))[3].mem).to.equal(sig[2].address);
+            expect((await searchRecord(pcn))[3].acc).to.equal(2);
           });
         });
 
@@ -2101,16 +2117,16 @@ describe("Policy", () => {
 
             it("should result in three records", async () => {
               const { pcn } = await loadFixture(deleteRecordTwo);
-              expect(await pcn.searchRecord()).to.have.length(3);
+              expect(await searchRecord(pcn)).to.have.length(3);
             });
 
             describe("record one", () => {
               it("sys: 0, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[0].sys).to.equal(0);
-                expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[0].acc).to.equal(0);
+                expect((await searchRecord(pcn))[0].sys).to.equal(0);
+                expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+                expect((await searchRecord(pcn))[0].acc).to.equal(0);
               });
             });
 
@@ -2118,9 +2134,9 @@ describe("Policy", () => {
               it("sys: 1, mem: 0, acc: 0", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[1].sys).to.equal(1);
-                expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
-                expect((await pcn.searchRecord())[1].acc).to.equal(0);
+                expect((await searchRecord(pcn))[1].sys).to.equal(1);
+                expect((await searchRecord(pcn))[1].mem).to.equal(sig[0].address);
+                expect((await searchRecord(pcn))[1].acc).to.equal(0);
               });
             });
 
@@ -2128,9 +2144,9 @@ describe("Policy", () => {
               it("sys: 1, mem: 1, acc: 1", async () => {
                 const { sig, pcn } = await loadFixture(deleteRecordTwo);
 
-                expect((await pcn.searchRecord())[2].sys).to.equal(1);
-                expect((await pcn.searchRecord())[2].mem).to.equal(sig[1].address);
-                expect((await pcn.searchRecord())[2].acc).to.equal(1);
+                expect((await searchRecord(pcn))[2].sys).to.equal(1);
+                expect((await searchRecord(pcn))[2].mem).to.equal(sig[1].address);
+                expect((await searchRecord(pcn))[2].acc).to.equal(1);
               });
             });
           });
@@ -2326,16 +2342,16 @@ describe("Policy", () => {
 
         it("should result in two records", async () => {
           const { pcn } = await loadFixture(deleteRecord);
-          expect(await pcn.searchRecord()).to.have.length(2);
+          expect(await searchRecord(pcn)).to.have.length(2);
         });
 
         describe("record one", () => {
           it("sys: 0, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(deleteRecord);
 
-            expect((await pcn.searchRecord())[0].sys).to.equal(0);
-            expect((await pcn.searchRecord())[0].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[0].acc).to.equal(0);
+            expect((await searchRecord(pcn))[0].sys).to.equal(0);
+            expect((await searchRecord(pcn))[0].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[0].acc).to.equal(0);
           });
         });
 
@@ -2343,9 +2359,9 @@ describe("Policy", () => {
           it("sys: 1, mem: 0, acc: 0", async () => {
             const { sig, pcn } = await loadFixture(deleteRecord);
 
-            expect((await pcn.searchRecord())[1].sys).to.equal(1);
-            expect((await pcn.searchRecord())[1].mem).to.equal(sig[0].address);
-            expect((await pcn.searchRecord())[1].acc).to.equal(0);
+            expect((await searchRecord(pcn))[1].sys).to.equal(1);
+            expect((await searchRecord(pcn))[1].mem).to.equal(sig[0].address);
+            expect((await searchRecord(pcn))[1].acc).to.equal(0);
           });
         });
       });
@@ -2468,3 +2484,8 @@ describe("Policy", () => {
     });
   });
 });
+
+const searchRecord = async (pcn: Policy) => {
+  const [_, rec] = await pcn.searchRecord(0, await pcn.searchBlocks());
+  return rec;
+}

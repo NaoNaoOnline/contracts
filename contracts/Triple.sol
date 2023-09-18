@@ -205,11 +205,30 @@ library Triple {
         return sta.memcnt[sys];
     }
 
-    /// @notice _searchRecord returns all records managed internally.
+    /// @notice _searchRecord returns all records of a cursor based iteration.
+    /// @notice Iteration results span from lef to rig.
+    /// @param lef the cursor to start iterating from.
+    /// @param rig the cursor to end iteration at.
+    /// @return don expresses whether the final list of results were returned.
+    /// @return lis the list of records according to lef and rig.
     function _searchRecord(
-        States storage sta
-    ) internal view returns (Record[] memory) {
-        // TODO support chunking
-        return sta.reclis;
+        States storage sta,
+        uint256 lef,
+        uint256 rig
+    ) external view returns (bool, Record[] memory) {
+        bool don = false;
+
+        if (rig > sta.reclis.length) {
+            don = true;
+            rig = sta.reclis.length;
+        }
+
+        Record[] memory lis = new Record[](rig - lef);
+
+        for (uint256 i = lef; i < rig; i++) {
+            lis[i - lef] = sta.reclis[i];
+        }
+
+        return (don, lis);
     }
 }
