@@ -8,9 +8,8 @@ describe("Policy", () => {
   const deployContract = async () => {
     const sig = await ethers.getSigners();
 
-    const tcn = await (await ethers.getContractFactory("Triple")).deploy();
     // TODO test searchRecord iterations
-    const pcn = await (await ethers.getContractFactory("Policy", { libraries: { Triple: await tcn.getAddress() } })).deploy(0);
+    const pcn = await (await ethers.getContractFactory("Policy")).deploy(0);
 
     return { sig, pcn };
   }

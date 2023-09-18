@@ -215,7 +215,7 @@ library Triple {
         States storage sta,
         uint256 lef,
         uint256 rig
-    ) external view returns (bool, Record[] memory) {
+    ) internal view returns (bool, Record[] memory) {
         bool don = false;
 
         if (rig > sta.reclis.length) {

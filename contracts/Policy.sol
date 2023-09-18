@@ -22,7 +22,7 @@ contract Policy {
     ///
 
     /// @notice _amount is the maximum amount of records returned in a single call to searchRecord.
-    uint256 private _amount;
+    uint256 private immutable _amount;
 
     /// @notice _blocks is the block height of the last internal state change.
     uint256 private _blocks;
