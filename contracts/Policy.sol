@@ -110,7 +110,7 @@ contract Policy {
     /// VIEW
     ///
 
-    /// @notice searchAmount returns the maximum number of records returned with every call to searchRecord.
+    /// @notice searchAmount returns the maximum amount of records returned in a single call to searchRecord.
     function searchAmount() public view returns (uint256) {
         return _amount;
     }
