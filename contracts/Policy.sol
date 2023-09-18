@@ -168,7 +168,7 @@ contract Policy {
     /// INTERNAL
     ///
 
-    /// @notice _verifyCreate expresses whether adding the given record is allowed to be created.
+    /// @notice _verifyCreate expresses whether the given record is allowed to be created.
     /// @notice Emits CreateSystem or CreateMember.
     /// @param rec the record to create.
     /// @return bool true if the given record can be created, otherwise false.
