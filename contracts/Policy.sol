@@ -42,7 +42,7 @@ contract Policy {
     /// @notice _amount is the maximum amount of records returned in a single call to searchRecord.
     uint256 private _amount;
 
-    /// @notice _blocks is the block height of the last internal state changes.
+    /// @notice _blocks is the block height of the last internal state change.
     uint256 private _blocks;
 
     /// @notice _states is the internally managed list of all Records onchain.
