@@ -245,7 +245,7 @@ contract Policy {
         return false;
     }
 
-    /// @notice _verifyDelete expresses whether removing the given record is allowed to be deleted.
+    /// @notice _verifyDelete expresses whether the given record is allowed to be deleted.
     /// @notice Emits DeleteSystem or DeleteMember.
     /// @param rec the record to delete.
     /// @return bool true if the given record can be deleted, otherwise false.
