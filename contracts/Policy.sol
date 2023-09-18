@@ -18,18 +18,24 @@ contract Policy {
     using Triple for Triple.States;
 
     ///
+    /// VARIABLES
+    ///
+
+    /// @notice _amount is the maximum amount of records returned in a single call to searchRecord.
+    uint256 private _amount;
+
+    /// @notice _blocks is the block height of the last internal state change.
+    uint256 private _blocks;
+
+    /// @notice _states is the internally managed list of all Records onchain.
+    Triple.States private _states;
+
+    ///
     /// EVENTS
     ///
 
     /// @notice CreateMember is emitted when a member is created within a system.
     event CreateMember(
-        uint256 indexed sys,
-        address indexed mem,
-        uint256 indexed acc
-    );
-
-    /// @notice DeleteMember is emitted when a member is deleted within a system.
-    event DeleteMember(
         uint256 indexed sys,
         address indexed mem,
         uint256 indexed acc
@@ -42,25 +48,19 @@ contract Policy {
         uint256 indexed acc
     );
 
+    /// @notice DeleteMember is emitted when a member is deleted within a system.
+    event DeleteMember(
+        uint256 indexed sys,
+        address indexed mem,
+        uint256 indexed acc
+    );
+
     /// @notice DeleteSystem is emitted when a system is deleted.
     event DeleteSystem(
         uint256 indexed sys,
         address indexed mem,
         uint256 indexed acc
     );
-
-    ///
-    /// TYPES
-    ///
-
-    /// @notice _amount is the maximum amount of records returned in a single call to searchRecord.
-    uint256 private _amount;
-
-    /// @notice _blocks is the block height of the last internal state change.
-    uint256 private _blocks;
-
-    /// @notice _states is the internally managed list of all Records onchain.
-    Triple.States private _states;
 
     ///
     /// CONSTRUCTOR
@@ -331,9 +331,10 @@ contract Policy {
         //     The system to remove the member from must exist.
         //     The member to remove must exist in that system.
         //     The caller must have access zero in system zero.
+        //     The member to remove must not be the last member in that system.
         //     The caller must not remove themselves.
         //
-        if (dre && dse && dme && czz && !cim) {
+        if (dre && dse && dme && czz && !oom && !cim) {
             emit DeleteMember(rec.sys, rec.mem, rec.acc);
             return true;
         }
@@ -367,6 +368,21 @@ contract Policy {
         //     The caller must remove themselves.
         //
         if (dre && dse && dme && saz && oom && rec.sys != 0 && cim) {
+            emit DeleteSystem(rec.sys, rec.mem, rec.acc);
+            return true;
+        }
+
+        // Access zero in system zero can remove anyone and delete that system
+        // in the process.
+        //
+        //     The record to remove must exist as given.
+        //     The system to remove the member from must exist.
+        //     The member to remove must exist in that system.
+        //     The caller must have access zero in system zero.
+        //     The member to remove must be the last member in that system.
+        //     The caller must not remove themselves.
+        //
+        if (dre && dse && dme && czz && oom && !cim) {
             emit DeleteSystem(rec.sys, rec.mem, rec.acc);
             return true;
         }
