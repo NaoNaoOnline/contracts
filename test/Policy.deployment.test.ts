@@ -54,6 +54,20 @@ describe("Policy.deployment", () => {
         expect((await searchRecord(pcn))[0].acc).to.equal(0);
       });
     });
+
+    describe("_amount", () => {
+      it("should deafult to 100", async () => {
+        const { pcn } = await loadFixture(deployContract);
+        expect((await pcn.searchAmount())).to.equal(100);
+      });
+    });
+
+    describe("_blocks", () => {
+      it("should be set to block height of deployment transaction", async () => {
+        const { pcn } = await loadFixture(deployContract);
+        expect((await pcn.searchBlocks())).to.equal(pcn.deploymentTransaction()?.blockNumber);
+      });
+    });
   });
 });
 
