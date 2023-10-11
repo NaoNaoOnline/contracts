@@ -3,8 +3,8 @@ import { ethers } from "hardhat";
 async function main() {
   const sig = await ethers.getSigners();
 
-  for (const y of sig) {
-    console.log(y.address);
+  for (const x of sig) {
+    console.log(x.address);
   }
 }
 
