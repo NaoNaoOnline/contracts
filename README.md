@@ -33,7 +33,29 @@ npm run test
 
 
 
-### Deployment
+### Development
+
+For historic reasons the contracts have been tested in typescript using Hardhat.
+For local deployment it is advisable to run an Anvil node. Please install the
+[Foundry] toolbox and run the Anvil node locally.
+
+```
+anvil
+```
+
+```
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+
+    0.2.0 (dbd935b 2023-10-17T00:32:29.831754000Z)
+    https://github.com/foundry-rs/foundry
+```
+
+The contracts can be deployed using the Hardhat script on any local node.
 
 ```
 npx hardhat run --network localhost scripts/deploy.ts
@@ -42,6 +64,9 @@ npx hardhat run --network localhost scripts/deploy.ts
 ```
 Policy contract deployed to 0x5FbDB2315678afecb367f032d93F642f64180aa3
 ```
+
+The available accounts can also be printed using the Hardhat script on any local
+node.
 
 ```
 npx hardhat run scripts/accounts.ts
@@ -65,4 +90,5 @@ import "hardhat/console.sol";
 
 
 [ACLs]: https://en.wikipedia.org/wiki/Access-control_list
+[Foundry]: https://github.com/foundry-rs/foundry
 [RBAC]: https://en.wikipedia.org/wiki/Role-based_access_control
