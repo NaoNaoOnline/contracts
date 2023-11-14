@@ -65,6 +65,24 @@ npx hardhat run --network localhost scripts/deploy.ts
 Policy contract deployed to 0x5FbDB2315678afecb367f032d93F642f64180aa3
 ```
 
+The current state of policy records can be looked up using the HArdhat script on
+any local node.
+
+```
+npx hardhat run --network localhost scripts/search.ts
+```
+
+```
+Blocks before iteration 7
+
+   0 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 0
+   1 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 0
+   1 0x6591C0Ee99D48b43a2c84Da284DB7A526C2dAfE0 1
+   2 0x6591C0Ee99D48b43a2c84Da284DB7A526C2dAfE0 0
+
+Blocks after iteration 7
+```
+
 The available accounts can also be printed using the Hardhat script on any local
 node.
 
