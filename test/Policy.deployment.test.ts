@@ -56,7 +56,7 @@ describe("Policy.deployment", () => {
     });
 
     describe("_amount", () => {
-      it("should deafult to 100", async () => {
+      it("should default to 100", async () => {
         const { pcn } = await loadFixture(deployContract);
         expect((await pcn.searchAmount())).to.equal(100);
       });
