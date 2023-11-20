@@ -180,7 +180,8 @@ contract Subscription is Ownable {
     /// OWNER
     ///
 
-    /// @notice setFeeAdd TODO
+    /// @notice setFeeAdd allows the contract owner to change _feeadd.
+    /// @param feeadd the new value for _feeadd, any but zero address.
     function setFeeAdd(address feeadd) external onlyOwner {
         require(feeadd != address(0), "fee address must not be zero");
 
@@ -189,7 +190,8 @@ contract Subscription is Ownable {
         emit SetFeeAdd(feeadd);
     }
 
-    /// @notice setFeeAmn TODO
+    /// @notice setFeeAmn allows the contract owner to change _feeamn.
+    /// @param feeamn the new value for _feeamn, between 100 and 5000.
     function setFeeAmn(uint256 feeamn) external onlyOwner {
         require(feeamn >= 100, "fee amount must be >= 1%");
         require(feeamn <= 5000, "fee amount must be <= 50%");
@@ -199,9 +201,10 @@ contract Subscription is Ownable {
         emit SetFeeAmn(feeamn);
     }
 
-    /// @notice setSubAmn TODO
+    /// @notice setSubAmn allows the contract owner to change _subamn.
+    /// @param subamn the new value for _subamn, greater than 0.
     function setSubAmn(uint256 subamn) external onlyOwner {
-        require(subamn != 0, "subscription amount must not be empty");
+        require(subamn != 0, "subscription amount must not be zero");
 
         _subamn = subamn;
 
