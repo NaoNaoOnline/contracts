@@ -21,17 +21,27 @@ describe("Subscription.setFeeAdd", () => {
     });
 
     describe("signer two", () => {
-      const setFeeAddFiv = async () => {
-        const { sig, scn } = await loadFixture(deployContract);
+      describe("zero address", () => {
+        it("should not be able to change the fee address to zero address", async () => {
+          const { sig, scn } = await loadFixture(deployContract);
+          const tnx = scn.connect(sig[1]).setFeeAdd(ethers.ZeroAddress)
+          await expect(tnx).to.be.revertedWith("fee address must not be zero");
+        });
+      });
 
-        await scn.connect(sig[1]).setFeeAdd(sig[4])
+      describe("valid address", () => {
+        const setFeeAddFiv = async () => {
+          const { sig, scn } = await loadFixture(deployContract);
 
-        return { sig, scn };
-      }
+          await scn.connect(sig[1]).setFeeAdd(sig[4])
 
-      it("should be able to change the fee address to somebody else", async () => {
-        const { sig, scn } = await loadFixture(setFeeAddFiv);
-        expect((await scn.getFeeAdd())).to.equal(sig[4].address);
+          return { sig, scn };
+        }
+
+        it("should be able to change the fee address to somebody else", async () => {
+          const { sig, scn } = await loadFixture(setFeeAddFiv);
+          expect((await scn.getFeeAdd())).to.equal(sig[4].address);
+        });
       });
     });
 
