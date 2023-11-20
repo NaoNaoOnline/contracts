@@ -13,7 +13,7 @@ describe("Subscription.deployment", () => {
 
   describe("deployment", () => {
     describe("_feeadd", () => {
-      it("should default to signer one", async () => {
+      it("should default to signer two", async () => {
         const { sig, scn } = await loadFixture(deployContract);
         expect((await scn.getFeeAdd())).to.equal(sig[1].address);
       });
