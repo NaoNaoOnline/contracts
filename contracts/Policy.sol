@@ -85,14 +85,14 @@ contract Policy {
     }
 
     ///
-    /// PUBLIC
+    /// EXTERNAL
     ///
 
     /// @notice createRecord allows privileged members to add records onchain.
     /// @notice Reverts on unprivileged access.
     /// @notice Emits CreateSystem or CreateMember via _createRecord.
     /// @param rec the record to create.
-    function createRecord(Triple.Record memory rec) public {
+    function createRecord(Triple.Record memory rec) external {
         if (!_verifyCreate(rec)) {
             revert();
         }
@@ -107,7 +107,7 @@ contract Policy {
     /// @notice Reverts on unprivileged access.
     /// @notice Emits DeleteSystem or DeleteMember via _deleteRecord.
     /// @param rec the record to delete.
-    function deleteRecord(Triple.Record memory rec) public {
+    function deleteRecord(Triple.Record memory rec) external {
         if (!_verifyDelete(rec)) {
             revert();
         }
@@ -123,12 +123,12 @@ contract Policy {
     ///
 
     /// @notice searchAmount returns the maximum amount of records returned in a single call to searchRecord.
-    function searchAmount() public view returns (uint256) {
+    function searchAmount() external view returns (uint256) {
         return _amount;
     }
 
     /// @notice searchBlocks returns the block height of the last internal state change.
-    function searchBlocks() public view returns (uint256) {
+    function searchBlocks() external view returns (uint256) {
         return _blocks;
     }
 
@@ -145,7 +145,7 @@ contract Policy {
     function searchRecord(
         uint256 cur,
         uint256 blo
-    ) public view returns (uint256, Triple.Record[] memory) {
+    ) external view returns (uint256, Triple.Record[] memory) {
         if (blo != _blocks) {
             revert();
         }
