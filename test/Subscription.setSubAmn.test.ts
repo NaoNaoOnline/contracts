@@ -15,7 +15,7 @@ describe("Subscription.setSubAmn", () => {
     describe("signer one (deployer)", () => {
       it("should not be able to change the subscription amount", async () => {
         const { sig, scn } = await loadFixture(deployContract);
-        const tnx = scn.connect(sig[0]).setSubAmn(BigInt("500000000000000000"))
+        const tnx = scn.connect(sig[0]).setSubAmn(ethers.parseUnits("0.5", "ether"))
         await expect(tnx).to.be.revertedWithCustomError(scn, "OwnableUnauthorizedAccount");
       });
     });
@@ -33,14 +33,14 @@ describe("Subscription.setSubAmn", () => {
         const setSubAmn05E = async () => {
           const { sig, scn } = await loadFixture(deployContract);
 
-          await scn.connect(sig[1]).setSubAmn(BigInt("500000000000000000"))
+          await scn.connect(sig[1]).setSubAmn(ethers.parseUnits("0.5", "ether"))
 
           return { sig, scn };
         }
 
         it("should be able to change the subscription amount to exactly 0.5 ETH", async () => {
           const { scn } = await loadFixture(setSubAmn05E);
-          expect((await scn.getSubAmn())).to.equal(BigInt("500000000000000000"));
+          expect((await scn.getSubAmn())).to.equal(ethers.parseUnits("0.5", "ether"));
         });
       });
     });
@@ -48,7 +48,7 @@ describe("Subscription.setSubAmn", () => {
     describe("signer three", () => {
       it("should not be able to change the subscription amount", async () => {
         const { sig, scn } = await loadFixture(deployContract);
-        const tnx = scn.connect(sig[2]).setSubAmn(BigInt("500000000000000000"))
+        const tnx = scn.connect(sig[2]).setSubAmn(ethers.parseUnits("0.5", "ether"))
         await expect(tnx).to.be.revertedWithCustomError(scn, "OwnableUnauthorizedAccount");
       });
     });

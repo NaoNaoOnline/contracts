@@ -27,9 +27,9 @@ describe("Subscription.deployment", () => {
     });
 
     describe("_subamn", () => {
-      it("should default to 3000000000000000 wei", async () => {
+      it("should default to 0.003 ETH", async () => {
         const { scn } = await loadFixture(deployContract);
-        expect((await scn.getSubAmn())).to.equal(3000000000000000);
+        expect((await scn.getSubAmn())).to.equal(ethers.parseUnits("0.003", "ether"));
       });
     });
   });

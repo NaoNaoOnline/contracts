@@ -2,6 +2,7 @@
 pragma solidity 0.8.21;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
 /// @title Subscription Management
 /// @author xh3b4sd
@@ -20,9 +21,9 @@ contract Subscription is Ownable {
     /// @notice _subamn is the amount of ETH paid in wei for a subscription.
     uint256 private _subamn;
 
-    /// @notice _subunx is the mapping for paid subscriptions per interval.
-    /// @notice The interval here is expressed in unix seconds, e.g. 1698793200.
-    /// @notice The interval here is the start of any given month.
+    /// @notice _subunx is the mapping for paid subscriptions per period.
+    /// @notice The period here is expressed in unix seconds, e.g. 1698793200.
+    /// @notice The period here is the start of any given month.
     mapping(address => uint256) private _subunx;
 
     ///
@@ -54,11 +55,20 @@ contract Subscription is Ownable {
     /// EXTERNAL
     ///
 
-    /// @notice subOne TODO
+    /// @notice subOne allows anyone to subscribe for the subscription period.
+    /// @notice Subscriptions have to be renewed in advance every month.
+    /// @notice Subscribing for a subscription period requires paying a fee.
+    /// @notice Fees are paid to creator addresses, minus a service fee.
+    /// @param creator the beneficiary creator address.
+    /// @param unixsec the unix timestamp for the subscription period.
     function subOne(address creator, uint256 unixsec) external payable {
         // Verify the given input.
         require(creator != address(0), "creator address must not be zero");
+        require(unixsec >= 1698793200, "unix timestamp must be current");
         require(_subamn == msg.value, "subscription amount must match");
+
+        // Track the unix timestamp for this subscription.
+        _subunx[msg.sender] = unixsec;
 
         // Calculate the service fee.
         uint256 srvfee = feeAmn(msg.value);
@@ -69,9 +79,6 @@ contract Subscription is Ownable {
         // Transfer funds.
         payable(_feeadd).transfer(srvfee);
         payable(creator).transfer(creamn);
-
-        // Track the unix timestamp for this subscription.
-        _subunx[msg.sender] = unixsec;
     }
 
     /// @notice subTwo TODO
@@ -90,6 +97,9 @@ contract Subscription is Ownable {
         require(amntone + amnttwo == 100, "creator amount must add up to 100");
         require(_subamn == msg.value, "subscription amount must match");
 
+        // Track the unix timestamp for this subscription.
+        _subunx[msg.sender] = unixsec;
+
         // Calculate the service fee.
         uint256 srvfee = feeAmn(msg.value);
 
@@ -102,9 +112,6 @@ contract Subscription is Ownable {
         payable(_feeadd).transfer(srvfee);
         payable(creaone).transfer(oneamn);
         payable(creatwo).transfer(twoamn);
-
-        // Track the unix timestamp for this subscription.
-        _subunx[msg.sender] = unixsec;
     }
 
     /// @notice subThr TODO
@@ -129,6 +136,9 @@ contract Subscription is Ownable {
         );
         require(_subamn == msg.value, "subscription amount must match");
 
+        // Track the unix timestamp for this subscription.
+        _subunx[msg.sender] = unixsec;
+
         // Calculate the service fee.
         uint256 srvfee = feeAmn(msg.value);
 
@@ -143,9 +153,6 @@ contract Subscription is Ownable {
         payable(creaone).transfer(oneamn);
         payable(creatwo).transfer(twoamn);
         payable(creathr).transfer(thramn);
-
-        // Track the unix timestamp for this subscription.
-        _subunx[msg.sender] = unixsec;
     }
 
     ///
@@ -165,6 +172,14 @@ contract Subscription is Ownable {
     /// @notice getSubAmn returns the amount of ETH paid in wei for a subscription.
     function getSubAmn() external view returns (uint256) {
         return _subamn;
+    }
+
+    /// @notice hasVldSub TODO
+    function hasVldSub(
+        address subadd,
+        uint256 subsec
+    ) internal view returns (bool) {
+        return _subunx[subadd] == subsec;
     }
 
     ///
