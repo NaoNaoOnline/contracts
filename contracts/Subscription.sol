@@ -13,16 +13,16 @@ contract Subscription is Ownable {
     /// VARIABLES
     ///
 
-    /// @notice _feeadd is address receiving all deducted service fees.
+    /// @notice _feeadd is the address receiving all deducted service fees.
     address private _feeadd;
-    /// @notice _feeamn is service fee in basis points, e.g. 100 == 1%.
+    /// @notice _feeamn is the service fee in basis points, e.g. 100 == 1%.
     uint256 private _feeamn;
     /// @notice _subamn is the amount of ETH paid in wei for a subscription.
     uint256 private _subamn;
 
     /// @notice _subunx is the mapping for paid subscriptions per interval.
-    /// @notice the interval here is expressed in unix seconds, e.g. 1698793200.
-    /// @notice the interval here is the start of any given month.
+    /// @notice The interval here is expressed in unix seconds, e.g. 1698793200.
+    /// @notice The interval here is the start of any given month.
     mapping(address => uint256) private _subunx;
 
     ///
@@ -42,6 +42,8 @@ contract Subscription is Ownable {
     /// CONSTRUCTOR
     ///
 
+    /// @notice constructor for initializing an instance of the Subscription contract.
+    /// @param ownadd the initial owner address.
     constructor(address ownadd) Ownable(ownadd) {
         _feeadd = ownadd;
         _feeamn = 1000; // 1000 == 10%
