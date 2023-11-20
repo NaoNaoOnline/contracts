@@ -21,7 +21,7 @@ describe("Subscription.setFeeAmn", () => {
     });
 
     describe("signer two", () => {
-      const setFeeAmnFou = async () => {
+      const setFeeAmn50P = async () => {
         const { sig, scn } = await loadFixture(deployContract);
 
         await scn.connect(sig[1]).setFeeAmn(5000)
@@ -30,7 +30,7 @@ describe("Subscription.setFeeAmn", () => {
       }
 
       it("should be able to change the fee amount", async () => {
-        const { sig, scn } = await loadFixture(setFeeAmnFou);
+        const { sig, scn } = await loadFixture(setFeeAmn50P);
         expect((await scn.getFeeAmn())).to.equal(5000);
       });
     });

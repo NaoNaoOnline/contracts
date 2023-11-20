@@ -13,7 +13,7 @@ describe("Subscription.setFeeAdd", () => {
 
   describe("setFeeAdd", () => {
     describe("signer one (deployer)", () => {
-      it("should not be able to change the fee address", async () => {
+      it("should not be able to change the fee address to themselves", async () => {
         const { sig, scn } = await loadFixture(deployContract);
         const tnx = scn.connect(sig[0]).setFeeAdd(sig[0])
         await expect(tnx).to.be.revertedWithCustomError(scn, "OwnableUnauthorizedAccount");
@@ -21,24 +21,32 @@ describe("Subscription.setFeeAdd", () => {
     });
 
     describe("signer two", () => {
-      const setFeeAddFou = async () => {
+      const setFeeAddFiv = async () => {
         const { sig, scn } = await loadFixture(deployContract);
 
-        await scn.connect(sig[1]).setFeeAdd(sig[3])
+        await scn.connect(sig[1]).setFeeAdd(sig[4])
 
         return { sig, scn };
       }
 
-      it("should be able to change the fee address", async () => {
-        const { sig, scn } = await loadFixture(setFeeAddFou);
-        expect((await scn.getFeeAdd())).to.equal(sig[3].address);
+      it("should be able to change the fee address to somebody else", async () => {
+        const { sig, scn } = await loadFixture(setFeeAddFiv);
+        expect((await scn.getFeeAdd())).to.equal(sig[4].address);
       });
     });
 
     describe("signer three", () => {
-      it("should not be able to change the fee address", async () => {
+      it("should not be able to change the fee address to themselves", async () => {
         const { sig, scn } = await loadFixture(deployContract);
         const tnx = scn.connect(sig[2]).setFeeAdd(sig[2])
+        await expect(tnx).to.be.revertedWithCustomError(scn, "OwnableUnauthorizedAccount");
+      });
+    });
+
+    describe("signer four", () => {
+      it("should not be able to change the fee address to somebody else", async () => {
+        const { sig, scn } = await loadFixture(deployContract);
+        const tnx = scn.connect(sig[3]).setFeeAdd(sig[4])
         await expect(tnx).to.be.revertedWithCustomError(scn, "OwnableUnauthorizedAccount");
       });
     });
