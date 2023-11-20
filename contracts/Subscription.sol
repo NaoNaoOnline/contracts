@@ -2,7 +2,6 @@
 pragma solidity 0.8.21;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
 
 /// @title Subscription Management
 /// @author xh3b4sd
