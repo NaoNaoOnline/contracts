@@ -23,7 +23,7 @@ contract Subscription is Ownable {
     uint256 private _subamn;
 
     /// @notice _subunx is the mapping for paid subscriptions per period.
-    /// @notice The period here is expressed in unix seconds, e.g. 1698793200.
+    /// @notice The period here is expressed in unix seconds, e.g. 1696111200.
     /// @notice The period here is the start of any given month.
     mapping(address => uint256) private _subunx;
 
@@ -53,6 +53,18 @@ contract Subscription is Ownable {
     }
 
     ///
+    /// PUBLIC
+    ///
+
+    /// @notice getSubUnx returns the currently registered subscription period.
+    /// @notice Returns 0 if no subscription was registered ever.
+    /// @param subadd the subscription address to search for.
+    /// @return uint256 the associated subscription period, e.g. 1696111200.
+    function getSubUnx(address subadd) public view returns (uint256) {
+        return _subunx[subadd];
+    }
+
+    ///
     /// EXTERNAL
     ///
 
@@ -63,23 +75,35 @@ contract Subscription is Ownable {
     /// @param creator the beneficiary creator address.
     /// @param unixsec the unix timestamp for the subscription period.
     function subOne(address creator, uint256 unixsec) external payable {
-        // Verify the given input.
-        require(creator != address(0), "creator address must not be zero");
-        require(unixsec >= 1698793200, "unix timestamp must be current");
-        require(_subamn == msg.value, "subscription amount must match");
+        {
+            // Verify the given input.
+            require(creator != address(0), "creator address must not be zero");
+            require(_subamn == msg.value, "subscription amount must match");
 
-        // Track the unix timestamp for this subscription.
-        _subunx[msg.sender] = unixsec;
+            uint256 exi = getSubUnx(msg.sender);
+            if (exi == 0) {
+                require(unixsec > 1696111200, "unix timestamp must be current");
+            } else {
+                require(unixsec > exi, "unix timestamp must be current");
+            }
+        }
 
-        // Calculate the service fee.
-        uint256 srvfee = feeAmn(msg.value);
+        {
+            // Track the unix timestamp for this subscription.
+            _subunx[msg.sender] = unixsec;
+        }
 
-        // Calculate the amount received by the creator.
-        uint256 creamn = msg.value - srvfee;
+        {
+            // Calculate the service fee.
+            uint256 srvfee = feeAmn(msg.value);
 
-        // Transfer ETH.
-        payable(_feeadd).transfer(srvfee);
-        payable(creator).transfer(creamn);
+            // Calculate the amount received by the creator.
+            uint256 creamn = msg.value - srvfee;
+
+            // Transfer ETH.
+            payable(_feeadd).transfer(srvfee);
+            payable(creator).transfer(creamn);
+        }
     }
 
     /// @notice subTwo allows anyone to subscribe for the subscription period.
@@ -99,30 +123,45 @@ contract Subscription is Ownable {
         uint256 amnttwo,
         uint256 unixsec
     ) external payable {
-        // Verify the given input.
-        require(creaone != address(0), "creator address must not be zero");
-        require(creatwo != address(0), "creator address must not be zero");
-        require(amntone != 0, "creator amount must not be zero");
-        require(amnttwo != 0, "creator amount must not be zero");
-        require(amntone + amnttwo == 100, "creator amount must add up to 100");
-        require(unixsec >= 1698793200, "unix timestamp must be current");
-        require(_subamn == msg.value, "subscription amount must match");
+        {
+            // Verify the given input.
+            require(creaone != address(0), "creator address must not be zero");
+            require(creatwo != address(0), "creator address must not be zero");
+            require(amntone != 0, "creator amount must not be zero");
+            require(amnttwo != 0, "creator amount must not be zero");
+            require(
+                amntone + amnttwo == 100,
+                "creator amount must add up to 100"
+            );
+            require(_subamn == msg.value, "subscription amount must match");
 
-        // Track the unix timestamp for this subscription.
-        _subunx[msg.sender] = unixsec;
+            uint256 exi = getSubUnx(msg.sender);
+            if (exi == 0) {
+                require(unixsec > 1696111200, "unix timestamp must be current");
+            } else {
+                require(unixsec > exi, "unix timestamp must be current");
+            }
+        }
 
-        // Calculate the service fee.
-        uint256 srvfee = feeAmn(msg.value);
+        {
+            // Track the unix timestamp for this subscription.
+            _subunx[msg.sender] = unixsec;
+        }
 
-        // Calculate the amount received by the creator.
-        uint256 allamn = msg.value - srvfee;
-        uint256 oneamn = (allamn * amntone) / 100;
-        uint256 twoamn = (allamn * amnttwo) / 100;
+        {
+            // Calculate the service fee.
+            uint256 srvfee = feeAmn(msg.value);
 
-        // Transfer ETH.
-        payable(_feeadd).transfer(srvfee);
-        payable(creaone).transfer(oneamn);
-        payable(creatwo).transfer(twoamn);
+            // Calculate the amount received by the creator.
+            uint256 allamn = msg.value - srvfee;
+            uint256 oneamn = (allamn * amntone) / 100;
+            uint256 twoamn = (allamn * amnttwo) / 100;
+
+            // Transfer ETH.
+            payable(_feeadd).transfer(srvfee);
+            payable(creaone).transfer(oneamn);
+            payable(creatwo).transfer(twoamn);
+        }
     }
 
     /// @notice subThr allows anyone to subscribe for the subscription period.
@@ -146,37 +185,49 @@ contract Subscription is Ownable {
         uint256 amntthr,
         uint256 unixsec
     ) external payable {
-        // Verify the given input.
-        require(creaone != address(0), "creator address must not be zero");
-        require(creatwo != address(0), "creator address must not be zero");
-        require(creathr != address(0), "creator address must not be zero");
-        require(amntone != 0, "creator amount must not be zero");
-        require(amnttwo != 0, "creator amount must not be zero");
-        require(amntthr != 0, "creator amount must not be zero");
-        require(
-            amntone + amnttwo + amntthr == 100,
-            "creator amount must add up to 100"
-        );
-        require(unixsec >= 1698793200, "unix timestamp must be current");
-        require(_subamn == msg.value, "subscription amount must match");
+        {
+            // Verify the given input.
+            require(creaone != address(0), "creator address must not be zero");
+            require(creatwo != address(0), "creator address must not be zero");
+            require(creathr != address(0), "creator address must not be zero");
+            require(amntone != 0, "creator amount must not be zero");
+            require(amnttwo != 0, "creator amount must not be zero");
+            require(amntthr != 0, "creator amount must not be zero");
+            require(
+                amntone + amnttwo + amntthr == 100,
+                "creator amount must add up to 100"
+            );
+            require(_subamn == msg.value, "subscription amount must match");
 
-        // Track the unix timestamp for this subscription.
-        _subunx[msg.sender] = unixsec;
+            uint256 exi = getSubUnx(msg.sender);
+            if (exi == 0) {
+                require(unixsec > 1696111200, "unix timestamp must be current");
+            } else {
+                require(unixsec > exi, "unix timestamp must be current");
+            }
+        }
 
-        // Calculate the service fee.
-        uint256 srvfee = feeAmn(msg.value);
+        {
+            // Track the unix timestamp for this subscription.
+            _subunx[msg.sender] = unixsec;
+        }
 
-        // Calculate the amount received by the creator.
-        uint256 rstamn = msg.value - srvfee;
-        uint256 oneamn = (rstamn * amntone) / 100;
-        uint256 twoamn = (rstamn * amnttwo) / 100;
-        uint256 thramn = (rstamn * amntthr) / 100;
+        {
+            // Calculate the service fee.
+            uint256 srvfee = feeAmn(msg.value);
 
-        // Transfer ETH.
-        payable(_feeadd).transfer(srvfee);
-        payable(creaone).transfer(oneamn);
-        payable(creatwo).transfer(twoamn);
-        payable(creathr).transfer(thramn);
+            // Calculate the amount received by the creator.
+            uint256 rstamn = msg.value - srvfee;
+            uint256 oneamn = (rstamn * amntone) / 100;
+            uint256 twoamn = (rstamn * amnttwo) / 100;
+            uint256 thramn = (rstamn * amntthr) / 100;
+
+            // Transfer ETH.
+            payable(_feeadd).transfer(srvfee);
+            payable(creaone).transfer(oneamn);
+            payable(creatwo).transfer(twoamn);
+            payable(creathr).transfer(thramn);
+        }
     }
 
     ///
@@ -196,16 +247,6 @@ contract Subscription is Ownable {
     /// @notice getSubAmn returns the amount of ETH paid in wei for a subscription.
     function getSubAmn() external view returns (uint256) {
         return _subamn;
-    }
-
-    /// @notice hasVldSub expresses whether a valid subscription exists.
-    /// @param subadd the subscription address to check.
-    /// @param subsec the subscription period to check, e.g. 1698793200.
-    function hasVldSub(
-        address subadd,
-        uint256 subsec
-    ) external view returns (bool) {
-        return _subunx[subadd] == subsec;
     }
 
     ///
