@@ -43,6 +43,20 @@ describe("Subscription.subOne", () => {
             const tnx = scn.connect(sig[2]).subOne(sig[3], 169, { value: ethers.parseUnits("0.003", "ether") })
             await expect(tnx).to.be.revertedWith("unix timestamp must be current");
           });
+
+          it("should not be able to subscribe with earlier timestamp", async () => {
+            const { sig, scn } = await loadFixture(setFeeDefSubDef);
+            await scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[3], 1696111200, { value: ethers.parseUnits("0.003", "ether") })
+            await expect(tnx).to.be.revertedWith("unix timestamp must be current");
+          });
+
+          it("should not be able to subscribe with same timestamp twice", async () => {
+            const { sig, scn } = await loadFixture(setFeeDefSubDef);
+            await scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
+            await expect(tnx).to.be.revertedWith("unix timestamp must be current");
+          });
         });
 
         describe("invalid subscription amount", () => {
@@ -131,6 +145,20 @@ describe("Subscription.subOne", () => {
           it("should not be able to subscribe with outdated timestamp", async () => {
             const { sig, scn } = await loadFixture(setFee25PSub25F);
             const tnx = scn.connect(sig[2]).subOne(sig[3], 169, { value: ethers.parseUnits("0.025", "ether") })
+            await expect(tnx).to.be.revertedWith("unix timestamp must be current");
+          });
+
+          it("should not be able to subscribe with earlier timestamp", async () => {
+            const { sig, scn } = await loadFixture(setFee25PSub25F);
+            await scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.025", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[3], 1696111200, { value: ethers.parseUnits("0.025", "ether") })
+            await expect(tnx).to.be.revertedWith("unix timestamp must be current");
+          });
+
+          it("should not be able to subscribe with same timestamp twice", async () => {
+            const { sig, scn } = await loadFixture(setFee25PSub25F);
+            await scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.025", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.025", "ether") })
             await expect(tnx).to.be.revertedWith("unix timestamp must be current");
           });
         });
