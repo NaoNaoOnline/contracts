@@ -125,7 +125,18 @@ contract Subscription is Ownable {
         payable(creatwo).transfer(twoamn);
     }
 
-    /// @notice subThr TODO
+    /// @notice subThr allows anyone to subscribe for the subscription period.
+    /// @notice Subscriptions have to be renewed in advance every month.
+    /// @notice Subscribing for a subscription period requires paying a fee.
+    /// @notice Fees are paid to creator addresses, minus a service fee.
+    /// @notice Creator amounts must add up to 100%, e.g. 65, 30 and 5.
+    /// @param creaone the 1st beneficiary creator address.
+    /// @param amntone the 1st beneficiary creator amount in percent, e.g. 65.
+    /// @param creatwo the 2nd beneficiary creator address.
+    /// @param amnttwo the 2nd beneficiary creator amount in percent, e.g. 30.
+    /// @param creathr the 3rd beneficiary creator address.
+    /// @param amntthr the 3rd beneficiary creator amount in percent, e.g. 5.
+    /// @param unixsec the unix timestamp for the subscription period.
     function subThr(
         address creaone,
         uint256 amntone,
@@ -138,6 +149,7 @@ contract Subscription is Ownable {
         // Verify the given input.
         require(creaone != address(0), "creator address must not be zero");
         require(creatwo != address(0), "creator address must not be zero");
+        require(creathr != address(0), "creator address must not be zero");
         require(amntone != 0, "creator amount must not be zero");
         require(amnttwo != 0, "creator amount must not be zero");
         require(amntthr != 0, "creator amount must not be zero");
@@ -145,6 +157,7 @@ contract Subscription is Ownable {
             amntone + amnttwo + amntthr == 100,
             "creator amount must add up to 100"
         );
+        require(unixsec >= 1698793200, "unix timestamp must be current");
         require(_subamn == msg.value, "subscription amount must match");
 
         // Track the unix timestamp for this subscription.
