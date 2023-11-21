@@ -149,6 +149,7 @@ contract Subscription is Ownable {
         // Verify the given input.
         require(creaone != address(0), "creator address must not be zero");
         require(creatwo != address(0), "creator address must not be zero");
+        require(creathr != address(0), "creator address must not be zero");
         require(amntone != 0, "creator amount must not be zero");
         require(amnttwo != 0, "creator amount must not be zero");
         require(amntthr != 0, "creator amount must not be zero");
