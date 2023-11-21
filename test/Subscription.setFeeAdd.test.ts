@@ -33,14 +33,20 @@ describe("Subscription.setFeeAdd", () => {
         const setFeeAddFiv = async () => {
           const { sig, scn } = await loadFixture(deployContract);
 
-          await scn.connect(sig[1]).setFeeAdd(sig[4])
+          const tnx = scn.connect(sig[1]).setFeeAdd(sig[4])
+          await tnx;
 
-          return { sig, scn };
+          return { sig, scn, tnx };
         }
 
         it("should be able to change the fee address to somebody else", async () => {
           const { sig, scn } = await loadFixture(setFeeAddFiv);
           expect((await scn.getFeeAdd())).to.equal(sig[4].address);
+        });
+
+        it("should emit event SetFeeAdd", async () => {
+          const { sig, scn, tnx } = await loadFixture(setFeeAddFiv);
+          await expect(tnx).to.emit(scn, "SetFeeAdd").withArgs(sig[4].address);
         });
       });
     });
