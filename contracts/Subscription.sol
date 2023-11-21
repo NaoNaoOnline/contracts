@@ -31,13 +31,13 @@ contract Subscription is Ownable {
     /// EVENTS
     ///
 
-    /// @notice SetFeeAdd is emitted when the fee address changes.
+    /// @notice SetFeeAdd is emitted when the fee address changed.
     event SetFeeAdd(address feeadd);
 
-    /// @notice SetFeeAmn is emitted when the fee amount changes.
+    /// @notice SetFeeAmn is emitted when the fee amount changed.
     event SetFeeAmn(uint256 feeamn);
 
-    /// @notice SetSubAmn is emitted when the subscription amount changes.
+    /// @notice SetSubAmn is emitted when the subscription amount changed.
     event SetSubAmn(uint256 subamn);
 
     ///
@@ -177,7 +177,7 @@ contract Subscription is Ownable {
 
     /// @notice hasVldSub expresses whether a valid subscription exists.
     /// @param subadd the subscription address to check.
-    /// @param subsec the subscription period to check.
+    /// @param subsec the subscription period to check, e.g. 1698793200.
     function hasVldSub(
         address subadd,
         uint256 subsec
