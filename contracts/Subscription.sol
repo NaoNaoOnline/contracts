@@ -77,12 +77,21 @@ contract Subscription is Ownable {
         // Calculate the amount received by the creator.
         uint256 creamn = msg.value - srvfee;
 
-        // Transfer funds.
+        // Transfer ETH.
         payable(_feeadd).transfer(srvfee);
         payable(creator).transfer(creamn);
     }
 
-    /// @notice subTwo TODO
+    /// @notice subTwo allows anyone to subscribe for the subscription period.
+    /// @notice Subscriptions have to be renewed in advance every month.
+    /// @notice Subscribing for a subscription period requires paying a fee.
+    /// @notice Fees are paid to creator addresses, minus a service fee.
+    /// @notice Creator amounts must add up to 100%, e.g. 75 and 25.
+    /// @param creaone the 1st beneficiary creator address.
+    /// @param amntone the 1st beneficiary creator amount in percent, e.g. 75.
+    /// @param creatwo the 2nd beneficiary creator address.
+    /// @param amnttwo the 2nd beneficiary creator amount in percent, e.g. 25.
+    /// @param unixsec the unix timestamp for the subscription period.
     function subTwo(
         address creaone,
         uint256 amntone,
@@ -96,6 +105,7 @@ contract Subscription is Ownable {
         require(amntone != 0, "creator amount must not be zero");
         require(amnttwo != 0, "creator amount must not be zero");
         require(amntone + amnttwo == 100, "creator amount must add up to 100");
+        require(unixsec >= 1698793200, "unix timestamp must be current");
         require(_subamn == msg.value, "subscription amount must match");
 
         // Track the unix timestamp for this subscription.
@@ -109,7 +119,7 @@ contract Subscription is Ownable {
         uint256 oneamn = (allamn * amntone) / 100;
         uint256 twoamn = (allamn * amnttwo) / 100;
 
-        // Transfer funds.
+        // Transfer ETH.
         payable(_feeadd).transfer(srvfee);
         payable(creaone).transfer(oneamn);
         payable(creatwo).transfer(twoamn);
@@ -149,7 +159,7 @@ contract Subscription is Ownable {
         uint256 twoamn = (rstamn * amnttwo) / 100;
         uint256 thramn = (rstamn * amntthr) / 100;
 
-        // Transfer funds.
+        // Transfer ETH.
         payable(_feeadd).transfer(srvfee);
         payable(creaone).transfer(oneamn);
         payable(creatwo).transfer(twoamn);
