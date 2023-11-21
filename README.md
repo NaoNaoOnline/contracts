@@ -58,7 +58,7 @@ anvil
 The contracts can be deployed using the Hardhat script on any local node.
 
 ```
-npx hardhat run --network localhost scripts/deploy.ts
+npx hardhat run --network localhost scripts/deploy_policy.ts
 ```
 
 ```
@@ -69,7 +69,7 @@ The current state of policy records can be looked up using the HArdhat script on
 any local node.
 
 ```
-npx hardhat run --network localhost scripts/search.ts
+npx hardhat run --network localhost scripts/search_policy.ts
 ```
 
 ```
@@ -81,6 +81,14 @@ Blocks before iteration 7
    2 0x6591C0Ee99D48b43a2c84Da284DB7A526C2dAfE0 0
 
 Blocks after iteration 7
+```
+
+```
+npx hardhat run --network localhost scripts/deploy_subscription.ts
+```
+
+```
+Subscription contract deployed to 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
 ```
 
 The available accounts can also be printed using the Hardhat script on any local
