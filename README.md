@@ -55,7 +55,7 @@ anvil
     https://github.com/foundry-rs/foundry
 ```
 
-The contracts can be deployed using the Hardhat script on any local node.
+The policy contract can be deployed using the Hardhat script on any local node.
 
 ```
 npx hardhat run --network localhost scripts/deploy_policy.ts
@@ -82,6 +82,9 @@ Blocks before iteration 7
 
 Blocks after iteration 7
 ```
+
+The subscription contract can be deployed using the Hardhat script on any local
+node.
 
 ```
 npx hardhat run --network localhost scripts/deploy_subscription.ts
