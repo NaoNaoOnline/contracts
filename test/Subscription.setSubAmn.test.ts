@@ -33,14 +33,20 @@ describe("Subscription.setSubAmn", () => {
         const setSubAmn05E = async () => {
           const { sig, scn } = await loadFixture(deployContract);
 
-          await scn.connect(sig[1]).setSubAmn(ethers.parseUnits("0.5", "ether"))
+          const tnx = scn.connect(sig[1]).setSubAmn(ethers.parseUnits("0.5", "ether"))
+          await tnx;
 
-          return { sig, scn };
+          return { sig, scn, tnx };
         }
 
         it("should be able to change the subscription amount to exactly 0.5 ETH", async () => {
           const { scn } = await loadFixture(setSubAmn05E);
           expect((await scn.getSubAmn())).to.equal(ethers.parseUnits("0.5", "ether"));
+        });
+
+        it("should emit event SetSubAmn", async () => {
+          const { scn, tnx } = await loadFixture(setSubAmn05E);
+          await expect(tnx).to.emit(scn, "SetSubAmn").withArgs(ethers.parseUnits("0.5", "ether"));
         });
       });
     });

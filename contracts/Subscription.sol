@@ -2,11 +2,12 @@
 pragma solidity 0.8.21;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "hardhat/console.sol";
 
 /// @title Subscription Management
 /// @author xh3b4sd
 /// @notice Subscription is a fee deducting payment splitter.
+/// @notice Subscriptions have to be renewed periodically.
+/// @notice Subscriptions can be verified for a certain period.
 /// @notice All payment interactions are peer-to-peer.
 /// @notice User funds are never custodied inside the contract.
 contract Subscription is Ownable {
@@ -30,13 +31,13 @@ contract Subscription is Ownable {
     /// EVENTS
     ///
 
-    /// @notice SetFeeAdd TODO
+    /// @notice SetFeeAdd is emitted when the fee address changed.
     event SetFeeAdd(address feeadd);
 
-    /// @notice SetFeeAmn TODO
+    /// @notice SetFeeAmn is emitted when the fee amount changed.
     event SetFeeAmn(uint256 feeamn);
 
-    /// @notice SetSubAmn TODO
+    /// @notice SetSubAmn is emitted when the subscription amount changed.
     event SetSubAmn(uint256 subamn);
 
     ///
@@ -174,11 +175,13 @@ contract Subscription is Ownable {
         return _subamn;
     }
 
-    /// @notice hasVldSub TODO
+    /// @notice hasVldSub expresses whether a valid subscription exists.
+    /// @param subadd the subscription address to check.
+    /// @param subsec the subscription period to check, e.g. 1698793200.
     function hasVldSub(
         address subadd,
         uint256 subsec
-    ) internal view returns (bool) {
+    ) external view returns (bool) {
         return _subunx[subadd] == subsec;
     }
 
@@ -186,7 +189,8 @@ contract Subscription is Ownable {
     /// INTERNAL
     ///
 
-    /// @notice feeAmn TODO
+    /// @notice feeAmn returns the basis point adjusted service fee.
+    /// @param amount the msg.value to calculate the service fee from.
     function feeAmn(uint256 amount) internal view returns (uint256) {
         return (amount * _feeamn) / 10000;
     }
@@ -230,13 +234,13 @@ contract Subscription is Ownable {
     /// BUILTIN
     ///
 
-    /// @notice fallback TODO
+    /// @notice fallback will always revert.
     fallback() external payable {
-        revert("not implemented");
+        revert("fallback() not implemented");
     }
 
-    /// @notice receive TODO
+    /// @notice receive will always revert.
     receive() external payable {
-        revert("not implemented");
+        revert("receive() not implemented");
     }
 }

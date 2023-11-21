@@ -33,14 +33,20 @@ describe("Subscription.setFeeAmn", () => {
         const setFeeAmn01P = async () => {
           const { sig, scn } = await loadFixture(deployContract);
 
-          await scn.connect(sig[1]).setFeeAmn(100)
+          const tnx = scn.connect(sig[1]).setFeeAmn(100)
+          await tnx;
 
-          return { sig, scn };
+          return { sig, scn, tnx };
         }
 
         it("should be able to change the fee amount to exactly 1%", async () => {
           const { scn } = await loadFixture(setFeeAmn01P);
           expect((await scn.getFeeAmn())).to.equal(100);
+        });
+
+        it("should emit event SetFeeAmn", async () => {
+          const { scn, tnx } = await loadFixture(setFeeAmn01P);
+          await expect(tnx).to.emit(scn, "SetFeeAmn").withArgs(100);
         });
       });
 
@@ -48,14 +54,20 @@ describe("Subscription.setFeeAmn", () => {
         const setFeeAmn50P = async () => {
           const { sig, scn } = await loadFixture(deployContract);
 
-          await scn.connect(sig[1]).setFeeAmn(5000)
+          const tnx = scn.connect(sig[1]).setFeeAmn(5000)
+          await tnx;
 
-          return { sig, scn };
+          return { sig, scn, tnx };
         }
 
         it("should be able to change the fee amount to exactly 50%", async () => {
           const { scn } = await loadFixture(setFeeAmn50P);
           expect((await scn.getFeeAmn())).to.equal(5000);
+        });
+
+        it("should emit event SetFeeAmn", async () => {
+          const { scn, tnx } = await loadFixture(setFeeAmn50P);
+          await expect(tnx).to.emit(scn, "SetFeeAmn").withArgs(5000);
         });
       });
 
