@@ -55,7 +55,7 @@ contract Subscription is Ownable {
     constructor(address ownadd) Ownable(ownadd) {
         _feeadd = ownadd;
         _feeamn = 1000; // 1000 == 10%
-        _subamn = 3000000000000000; // 0.003 ETH == 6$ at 2000$ per ETH
+        _subamn = 3e15; // 3 Finney == 0.003 ETH == 6$ at 2000$ per ETH
     }
 
     ///

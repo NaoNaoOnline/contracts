@@ -119,6 +119,13 @@ npx hardhat run scripts/accounts.ts
 ...
 ```
 
+Some static analysis can be done using [Slither], which may help to catch some
+of the more obvious issues of smart contract code.
+
+```
+slither .
+```
+
 
 
 ### Debugging
@@ -132,3 +139,4 @@ import "hardhat/console.sol";
 [ACLs]: https://en.wikipedia.org/wiki/Access-control_list
 [Foundry]: https://github.com/foundry-rs/foundry
 [RBAC]: https://en.wikipedia.org/wiki/Role-based_access_control
+[Slither]: https://github.com/crytic/slither
