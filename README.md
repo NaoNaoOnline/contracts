@@ -27,8 +27,19 @@ the app itself becomes an easier task.
 
 ### Tests
 
+Simply running all tests works like shown below. Single tests can be run by
+declaring `describe.only` or `it.only` within the test files for the respective
+cases.
+
 ```
 npm run test
+```
+
+After Solidity interface changes the typescript bindings for the contracts can
+be re-generated using the following command.
+
+```
+npm run build
 ```
 
 
