@@ -28,10 +28,10 @@ contract Subscription is Ownable {
     /// @notice The period here is expressed in unix seconds, e.g. 1696111200.
     /// @notice The period here is the start of any given month.
     mapping(address => uint256) private _subunx;
-    /// @notice _subadd is the mapping for creator paid by a subscriber.
+    /// @notice _subadd is the mapping for creators paid by a subscriber.
     /// @notice The map key here is the subscription address.
     /// @notice The map value here are the paid creator addresses.
-    mapping(address => address[]) private _subadd;
+    mapping(address => address[3]) private _subadd;
 
     ///
     /// EVENTS
@@ -71,10 +71,10 @@ contract Subscription is Ownable {
     }
 
     /// @notice getSubAdd returns the creator addresses paid for this period.
-    /// @notice Returns empty list if no subscription was registered ever.
+    /// @notice Returns zero addresses if no subscription was registered ever.
     /// @param subadd the subscription address to search for.
     /// @return address[] the list of paid creator addresses.
-    function getSubAdd(address subadd) public view returns (address[] memory) {
+    function getSubAdd(address subadd) public view returns (address[3] memory) {
         return _subadd[subadd];
     }
 
