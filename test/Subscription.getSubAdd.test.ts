@@ -2,7 +2,7 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-describe("Subscription.getSubUnx", () => {
+describe("Subscription.getSubAdd", () => {
   const deployContract = async () => {
     const sig = await ethers.getSigners();
 
@@ -11,7 +11,7 @@ describe("Subscription.getSubUnx", () => {
     return { sig, scn };
   }
 
-  describe("getSubUnx", () => {
+  describe("getSubAdd", () => {
     describe("single subscription", () => {
       const subOneSin = async () => {
         const { sig, scn } = await loadFixture(deployContract);
@@ -24,28 +24,28 @@ describe("Subscription.getSubUnx", () => {
       describe("signer one (deployer)", () => {
         it("should not have valid subscription", async () => {
           const { sig, scn } = await loadFixture(subOneSin);
-          expect((await scn.getSubUnx(sig[0]))).to.equal(0);
+          expect((await scn.getSubAdd(sig[0]))).to.have.length(0);
         });
       });
 
       describe("signer two", () => {
         it("should not have valid subscription", async () => {
           const { sig, scn } = await loadFixture(subOneSin);
-          expect((await scn.getSubUnx(sig[1]))).to.equal(0);
+          expect((await scn.getSubAdd(sig[1]))).to.have.length(0);
         });
       });
 
       describe("signer three", () => {
         it("should have valid subscription", async () => {
           const { sig, scn } = await loadFixture(subOneSin);
-          expect((await scn.getSubUnx(sig[2]))).to.equal(1698793200);
+          expect((await scn.getSubAdd(sig[2]))).to.deep.equal([sig[3].address]);
         });
       });
 
       describe("signer four", () => {
         it("should not have valid subscription", async () => {
           const { sig, scn } = await loadFixture(subOneSin);
-          expect((await scn.getSubUnx(sig[3]))).to.equal(0);
+          expect((await scn.getSubAdd(sig[3]))).to.have.length(0);
         });
       });
     });
@@ -63,28 +63,28 @@ describe("Subscription.getSubUnx", () => {
       describe("signer one (deployer)", () => {
         it("should not have valid subscription", async () => {
           const { sig, scn } = await loadFixture(subOneSin);
-          expect((await scn.getSubUnx(sig[0]))).to.equal(0);
+          expect((await scn.getSubAdd(sig[0]))).to.have.length(0);
         });
       });
 
       describe("signer two", () => {
         it("should not have valid subscription", async () => {
           const { sig, scn } = await loadFixture(subOneSin);
-          expect((await scn.getSubUnx(sig[1]))).to.equal(0);
+          expect((await scn.getSubAdd(sig[1]))).to.have.length(0);
         });
       });
 
       describe("signer three", () => {
         it("should have valid subscription", async () => {
           const { sig, scn } = await loadFixture(subOneSin);
-          expect((await scn.getSubUnx(sig[2]))).to.equal(1701385200);
+          expect((await scn.getSubAdd(sig[2]))).to.deep.equal([sig[3].address, sig[6].address]);
         });
       });
 
       describe("signer four", () => {
         it("should not have valid subscription", async () => {
           const { sig, scn } = await loadFixture(subOneSin);
-          expect((await scn.getSubUnx(sig[3]))).to.equal(0);
+          expect((await scn.getSubAdd(sig[3]))).to.have.length(0);
         });
       });
     });
@@ -103,28 +103,28 @@ describe("Subscription.getSubUnx", () => {
       describe("signer one (deployer)", () => {
         it("should not have valid subscription", async () => {
           const { sig, scn } = await loadFixture(subOneSin);
-          expect((await scn.getSubUnx(sig[0]))).to.equal(0);
+          expect((await scn.getSubAdd(sig[0]))).to.have.length(0);
         });
       });
 
       describe("signer two", () => {
         it("should not have valid subscription", async () => {
           const { sig, scn } = await loadFixture(subOneSin);
-          expect((await scn.getSubUnx(sig[1]))).to.equal(0);
+          expect((await scn.getSubAdd(sig[1]))).to.have.length(0);
         });
       });
 
       describe("signer three", () => {
         it("should have valid subscription", async () => {
           const { sig, scn } = await loadFixture(subOneSin);
-          expect((await scn.getSubUnx(sig[2]))).to.equal(1704063600);
+          expect((await scn.getSubAdd(sig[2]))).to.deep.equal([sig[3].address, sig[6].address, sig[9].address]);
         });
       });
 
       describe("signer four", () => {
         it("should not have valid subscription", async () => {
           const { sig, scn } = await loadFixture(subOneSin);
-          expect((await scn.getSubUnx(sig[3]))).to.equal(0);
+          expect((await scn.getSubAdd(sig[3]))).to.have.length(0);
         });
       });
     });

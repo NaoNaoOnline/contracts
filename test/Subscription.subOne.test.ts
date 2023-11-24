@@ -23,10 +23,18 @@ describe("Subscription.subOne", () => {
       }
 
       describe("signer three fails to subscribe", () => {
+        describe("invalid subscription address", () => {
+          it("should not be able to subscribe with zero address", async () => {
+            const { sig, scn } = await loadFixture(setFeeDefSubDef);
+            const tnx = scn.connect(sig[2]).subOne(ethers.ZeroAddress, sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
+            await expect(tnx).to.be.revertedWith("subscription address must not be zero");
+          });
+        });
+
         describe("invalid creator address", () => {
           it("should not be able to subscribe with zero address", async () => {
             const { sig, scn } = await loadFixture(setFeeDefSubDef);
-            const tnx = scn.connect(sig[2]).subOne(ethers.ZeroAddress, 1698793200, { value: ethers.parseUnits("0.003", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], ethers.ZeroAddress, 1698793200, { value: ethers.parseUnits("0.003", "ether") })
             await expect(tnx).to.be.revertedWith("creator address must not be zero");
           });
         });
@@ -34,27 +42,27 @@ describe("Subscription.subOne", () => {
         describe("invalid unix timestamp", () => {
           it("should not be able to subscribe with zero timestamp", async () => {
             const { sig, scn } = await loadFixture(setFeeDefSubDef);
-            const tnx = scn.connect(sig[2]).subOne(sig[3], 0, { value: ethers.parseUnits("0.003", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], sig[3], 0, { value: ethers.parseUnits("0.003", "ether") })
             await expect(tnx).to.be.revertedWith("unix timestamp must be current");
           });
 
           it("should not be able to subscribe with outdated timestamp", async () => {
             const { sig, scn } = await loadFixture(setFeeDefSubDef);
-            const tnx = scn.connect(sig[2]).subOne(sig[3], 169, { value: ethers.parseUnits("0.003", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], sig[3], 169, { value: ethers.parseUnits("0.003", "ether") })
             await expect(tnx).to.be.revertedWith("unix timestamp must be current");
           });
 
           it("should not be able to subscribe with earlier timestamp", async () => {
             const { sig, scn } = await loadFixture(setFeeDefSubDef);
-            await scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
-            const tnx = scn.connect(sig[2]).subOne(sig[3], 1696111200, { value: ethers.parseUnits("0.003", "ether") })
+            await scn.connect(sig[2]).subOne(sig[2], sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], sig[3], 1696111200, { value: ethers.parseUnits("0.003", "ether") })
             await expect(tnx).to.be.revertedWith("unix timestamp must be current");
           });
 
           it("should not be able to subscribe with same timestamp twice", async () => {
             const { sig, scn } = await loadFixture(setFeeDefSubDef);
-            await scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
-            const tnx = scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
+            await scn.connect(sig[2]).subOne(sig[2], sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
             await expect(tnx).to.be.revertedWith("unix timestamp must be current");
           });
         });
@@ -62,19 +70,19 @@ describe("Subscription.subOne", () => {
         describe("invalid subscription amount", () => {
           it("should not be able to subscribe with zero amount", async () => {
             const { sig, scn } = await loadFixture(setFeeDefSubDef);
-            const tnx = scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: 0 })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], sig[3], 1698793200, { value: 0 })
             await expect(tnx).to.be.revertedWith("subscription amount must match");
           });
 
           it("should not be able to subscribe with lesser amount", async () => {
             const { sig, scn } = await loadFixture(setFeeDefSubDef);
-            const tnx = scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.0027", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], sig[3], 1698793200, { value: ethers.parseUnits("0.0027", "ether") })
             await expect(tnx).to.be.revertedWith("subscription amount must match");
           });
 
           it("should not be able to subscribe with greater amount", async () => {
             const { sig, scn } = await loadFixture(setFeeDefSubDef);
-            const tnx = scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.5", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], sig[3], 1698793200, { value: ethers.parseUnits("0.5", "ether") })
             await expect(tnx).to.be.revertedWith("subscription amount must match");
           });
         });
@@ -88,7 +96,7 @@ describe("Subscription.subOne", () => {
           const bl2 = await ethers.provider.getBalance(sig[2]);
           const bl3 = await ethers.provider.getBalance(sig[3]);
 
-          await scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
+          await scn.connect(sig[2]).subOne(sig[2], sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
 
           return { sig, scn, bl1, bl2, bl3 };
         }
@@ -127,10 +135,18 @@ describe("Subscription.subOne", () => {
       }
 
       describe("signer three fails to subscribe", () => {
+        describe("invalid subscription address", () => {
+          it("should not be able to subscribe with zero address", async () => {
+            const { sig, scn } = await loadFixture(setFee25PSub25F);
+            const tnx = scn.connect(sig[2]).subOne(ethers.ZeroAddress, sig[3], 1698793200, { value: ethers.parseUnits("0.025", "ether") })
+            await expect(tnx).to.be.revertedWith("subscription address must not be zero");
+          });
+        });
+
         describe("invalid creator address", () => {
           it("should not be able to subscribe with zero address", async () => {
             const { sig, scn } = await loadFixture(setFee25PSub25F);
-            const tnx = scn.connect(sig[2]).subOne(ethers.ZeroAddress, 1698793200, { value: ethers.parseUnits("0.025", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], ethers.ZeroAddress, 1698793200, { value: ethers.parseUnits("0.025", "ether") })
             await expect(tnx).to.be.revertedWith("creator address must not be zero");
           });
         });
@@ -138,27 +154,27 @@ describe("Subscription.subOne", () => {
         describe("invalid unix timestamp", () => {
           it("should not be able to subscribe with zero timestamp", async () => {
             const { sig, scn } = await loadFixture(setFee25PSub25F);
-            const tnx = scn.connect(sig[2]).subOne(sig[3], 0, { value: ethers.parseUnits("0.025", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], sig[3], 0, { value: ethers.parseUnits("0.025", "ether") })
             await expect(tnx).to.be.revertedWith("unix timestamp must be current");
           });
 
           it("should not be able to subscribe with outdated timestamp", async () => {
             const { sig, scn } = await loadFixture(setFee25PSub25F);
-            const tnx = scn.connect(sig[2]).subOne(sig[3], 169, { value: ethers.parseUnits("0.025", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], sig[3], 169, { value: ethers.parseUnits("0.025", "ether") })
             await expect(tnx).to.be.revertedWith("unix timestamp must be current");
           });
 
           it("should not be able to subscribe with earlier timestamp", async () => {
             const { sig, scn } = await loadFixture(setFee25PSub25F);
-            await scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.025", "ether") })
-            const tnx = scn.connect(sig[2]).subOne(sig[3], 1696111200, { value: ethers.parseUnits("0.025", "ether") })
+            await scn.connect(sig[2]).subOne(sig[2], sig[3], 1698793200, { value: ethers.parseUnits("0.025", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], sig[3], 1696111200, { value: ethers.parseUnits("0.025", "ether") })
             await expect(tnx).to.be.revertedWith("unix timestamp must be current");
           });
 
           it("should not be able to subscribe with same timestamp twice", async () => {
             const { sig, scn } = await loadFixture(setFee25PSub25F);
-            await scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.025", "ether") })
-            const tnx = scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.025", "ether") })
+            await scn.connect(sig[2]).subOne(sig[2], sig[3], 1698793200, { value: ethers.parseUnits("0.025", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], sig[3], 1698793200, { value: ethers.parseUnits("0.025", "ether") })
             await expect(tnx).to.be.revertedWith("unix timestamp must be current");
           });
         });
@@ -166,19 +182,19 @@ describe("Subscription.subOne", () => {
         describe("invalid subscription amount", () => {
           it("should not be able to subscribe with zero amount", async () => {
             const { sig, scn } = await loadFixture(setFee25PSub25F);
-            const tnx = scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: 0 })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], sig[3], 1698793200, { value: 0 })
             await expect(tnx).to.be.revertedWith("subscription amount must match");
           });
 
           it("should not be able to subscribe with lesser amount", async () => {
             const { sig, scn } = await loadFixture(setFee25PSub25F);
-            const tnx = scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.0027", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], sig[3], 1698793200, { value: ethers.parseUnits("0.0027", "ether") })
             await expect(tnx).to.be.revertedWith("subscription amount must match");
           });
 
           it("should not be able to subscribe with greater amount", async () => {
             const { sig, scn } = await loadFixture(setFee25PSub25F);
-            const tnx = scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.5", "ether") })
+            const tnx = scn.connect(sig[2]).subOne(sig[2], sig[3], 1698793200, { value: ethers.parseUnits("0.5", "ether") })
             await expect(tnx).to.be.revertedWith("subscription amount must match");
           });
         });
@@ -192,7 +208,7 @@ describe("Subscription.subOne", () => {
           const bl2 = await ethers.provider.getBalance(sig[2]);
           const bl3 = await ethers.provider.getBalance(sig[3]);
 
-          await scn.connect(sig[2]).subOne(sig[3], 1698793200, { value: ethers.parseUnits("0.025", "ether") })
+          await scn.connect(sig[2]).subOne(sig[2], sig[3], 1698793200, { value: ethers.parseUnits("0.025", "ether") })
 
           return { sig, scn, bl1, bl2, bl3 };
         }
