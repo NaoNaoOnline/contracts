@@ -28,10 +28,10 @@ contract Subscription is Ownable {
     /// @notice The period here is expressed in unix seconds, e.g. 1696111200.
     /// @notice The period here is the start of any given month.
     mapping(address => uint256) private _subunx;
-    /// @notice _subadd is the mapping for creators paid by a subscriber.
-    /// @notice The map key here is the subscription address.
+    /// @notice _subrec is the mapping for creators paid per receiver.
+    /// @notice The map key here is the subscription or receiver address.
     /// @notice The map value here are the paid creator addresses.
-    mapping(address => address[3]) private _subadd;
+    mapping(address => address[3]) private _subrec;
 
     ///
     /// EVENTS
@@ -62,20 +62,20 @@ contract Subscription is Ownable {
     /// PUBLIC
     ///
 
-    /// @notice getSubUnx returns the currently registered subscription period.
-    /// @notice Returns 0 if no subscription was registered ever.
-    /// @param subadd the subscription address to search for.
-    /// @return uint256 the associated subscription period, e.g. 1696111200.
-    function getSubUnx(address subadd) public view returns (uint256) {
-        return _subunx[subadd];
+    /// @notice getSubRec returns the creator addresses paid for this period.
+    /// @notice Returns zero addresses if no subscription was registered ever.
+    /// @param subrec the subscription or receiver address to search for.
+    /// @return address[] the list of paid creator addresses.
+    function getSubRec(address subrec) public view returns (address[3] memory) {
+        return _subrec[subrec];
     }
 
-    /// @notice getSubAdd returns the creator addresses paid for this period.
-    /// @notice Returns zero addresses if no subscription was registered ever.
-    /// @param subadd the subscription address to search for.
-    /// @return address[] the list of paid creator addresses.
-    function getSubAdd(address subadd) public view returns (address[3] memory) {
-        return _subadd[subadd];
+    /// @notice getSubUnx returns the currently registered subscription period.
+    /// @notice Returns 0 if no subscription was registered ever.
+    /// @param subrec the subscription or receiver address to search for.
+    /// @return uint256 the associated subscription period, e.g. 1696111200.
+    function getSubUnx(address subrec) public view returns (uint256) {
+        return _subunx[subrec];
     }
 
     ///
@@ -86,24 +86,21 @@ contract Subscription is Ownable {
     /// @notice Subscriptions have to be renewed in advance every month.
     /// @notice Subscribing for a subscription period requires paying a fee.
     /// @notice Fees are paid to creator addresses, minus a service fee.
-    /// @param subadd the subscription address, can differ from msg.sender.
-    /// @param creator the beneficiary creator address.
+    /// @param subrec the subscription address, can differ from msg.sender.
+    /// @param creaone the beneficiary creator address.
     /// @param unixsec the unix timestamp for the subscription period.
     function subOne(
-        address subadd,
-        address creator,
+        address subrec,
+        address creaone,
         uint256 unixsec
     ) external payable {
         {
             // Verify the given input.
-            require(
-                subadd != address(0),
-                "subscription address must not be zero"
-            );
-            require(creator != address(0), "creator address must not be zero");
+            require(subrec != address(0), "receiver address must not be zero");
+            require(creaone != address(0), "creator address must not be zero");
             require(_subamn == msg.value, "subscription amount must match");
 
-            uint256 exi = getSubUnx(subadd);
+            uint256 exi = getSubUnx(subrec);
             if (exi == 0) {
                 require(unixsec > 1696111200, "unix timestamp must be current");
             } else {
@@ -113,14 +110,14 @@ contract Subscription is Ownable {
 
         {
             // Track the unix timestamp for this subscription. The map key here
-            // tells us who the subscriber is and the map value here tells us
-            // for which period they subscribed.
-            _subunx[subadd] = unixsec;
+            // tells us who the receiver is and the map value here tells us for
+            // which period they subscribed.
+            _subunx[subrec] = unixsec;
 
             // Track the paid creator addresses. The map key here tells us who
-            // the subscriber is and the map value here tells us which creators
+            // the receiver is and the map value here tells us which creators
             // they paid.
-            _subadd[subadd] = [creator];
+            _subrec[subrec] = [creaone];
         }
 
         {
@@ -132,7 +129,7 @@ contract Subscription is Ownable {
 
             // Transfer ETH.
             payable(_feeadd).transfer(srvfee);
-            payable(creator).transfer(creamn);
+            payable(creaone).transfer(creamn);
         }
     }
 
@@ -141,14 +138,14 @@ contract Subscription is Ownable {
     /// @notice Subscribing for a subscription period requires paying a fee.
     /// @notice Fees are paid to creator addresses, minus a service fee.
     /// @notice Creator amounts must add up to 100%, e.g. 75 and 25.
-    /// @param subadd the subscription address, can differ from msg.sender.
+    /// @param subrec the subscription address, can differ from msg.sender.
     /// @param creaone the 1st beneficiary creator address.
     /// @param amntone the 1st beneficiary creator amount in percent, e.g. 75.
     /// @param creatwo the 2nd beneficiary creator address.
     /// @param amnttwo the 2nd beneficiary creator amount in percent, e.g. 25.
     /// @param unixsec the unix timestamp for the subscription period.
     function subTwo(
-        address subadd,
+        address subrec,
         address creaone,
         uint256 amntone,
         address creatwo,
@@ -157,10 +154,7 @@ contract Subscription is Ownable {
     ) external payable {
         {
             // Verify the given input.
-            require(
-                subadd != address(0),
-                "subscription address must not be zero"
-            );
+            require(subrec != address(0), "receiver address must not be zero");
             require(creaone != address(0), "creator address must not be zero");
             require(creatwo != address(0), "creator address must not be zero");
             require(amntone != 0, "creator amount must not be zero");
@@ -171,7 +165,7 @@ contract Subscription is Ownable {
             );
             require(_subamn == msg.value, "subscription amount must match");
 
-            uint256 exi = getSubUnx(subadd);
+            uint256 exi = getSubUnx(subrec);
             if (exi == 0) {
                 require(unixsec > 1696111200, "unix timestamp must be current");
             } else {
@@ -181,14 +175,14 @@ contract Subscription is Ownable {
 
         {
             // Track the unix timestamp for this subscription. The map key here
-            // tells us who the subscriber is and the map value here tells us
-            // for which period they subscribed.
-            _subunx[subadd] = unixsec;
+            // tells us who the receiver is and the map value here tells us for
+            // which period they subscribed.
+            _subunx[subrec] = unixsec;
 
             // Track the paid creator addresses. The map key here tells us who
-            // the subscriber is and the map value here tells us which creators
+            // the receiver is and the map value here tells us which creators
             // they paid.
-            _subadd[subadd] = [creaone, creatwo];
+            _subrec[subrec] = [creaone, creatwo];
         }
 
         {
@@ -212,7 +206,7 @@ contract Subscription is Ownable {
     /// @notice Subscribing for a subscription period requires paying a fee.
     /// @notice Fees are paid to creator addresses, minus a service fee.
     /// @notice Creator amounts must add up to 100%, e.g. 65, 30 and 5.
-    /// @param subadd the subscription address, can differ from msg.sender.
+    /// @param subrec the subscription address, can differ from msg.sender.
     /// @param creaone the 1st beneficiary creator address.
     /// @param amntone the 1st beneficiary creator amount in percent, e.g. 65.
     /// @param creatwo the 2nd beneficiary creator address.
@@ -221,7 +215,7 @@ contract Subscription is Ownable {
     /// @param amntthr the 3rd beneficiary creator amount in percent, e.g. 5.
     /// @param unixsec the unix timestamp for the subscription period.
     function subThr(
-        address subadd,
+        address subrec,
         address creaone,
         uint256 amntone,
         address creatwo,
@@ -232,10 +226,7 @@ contract Subscription is Ownable {
     ) external payable {
         {
             // Verify the given input.
-            require(
-                subadd != address(0),
-                "subscription address must not be zero"
-            );
+            require(subrec != address(0), "receiver address must not be zero");
             require(creaone != address(0), "creator address must not be zero");
             require(creatwo != address(0), "creator address must not be zero");
             require(creathr != address(0), "creator address must not be zero");
@@ -248,7 +239,7 @@ contract Subscription is Ownable {
             );
             require(_subamn == msg.value, "subscription amount must match");
 
-            uint256 exi = getSubUnx(subadd);
+            uint256 exi = getSubUnx(subrec);
             if (exi == 0) {
                 require(unixsec > 1696111200, "unix timestamp must be current");
             } else {
@@ -258,14 +249,14 @@ contract Subscription is Ownable {
 
         {
             // Track the unix timestamp for this subscription. The map key here
-            // tells us who the subscriber is and the map value here tells us
-            // for which period they subscribed.
-            _subunx[subadd] = unixsec;
+            // tells us who the receiver is and the map value here tells us for
+            // which period they subscribed.
+            _subunx[subrec] = unixsec;
 
             // Track the paid creator addresses. The map key here tells us who
-            // the subscriber is and the map value here tells us which creators
+            // the receiver is and the map value here tells us which creators
             // they paid.
-            _subadd[subadd] = [creaone, creatwo, creathr];
+            _subrec[subrec] = [creaone, creatwo, creathr];
         }
 
         {

@@ -2,7 +2,7 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-describe("Subscription.getSubAdd", () => {
+describe("Subscription.getSubRec", () => {
   const deployContract = async () => {
     const sig = await ethers.getSigners();
 
@@ -11,7 +11,7 @@ describe("Subscription.getSubAdd", () => {
     return { sig, scn };
   }
 
-  describe("getSubAdd", () => {
+  describe("getSubRec", () => {
     describe("single subscription", () => {
       describe("for yourself", () => {
         const subOneSin = async () => {
@@ -25,28 +25,28 @@ describe("Subscription.getSubAdd", () => {
         describe("signer one (deployer)", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubAdd(sig[0]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[0]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
 
         describe("signer two", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubAdd(sig[1]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[1]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
 
         describe("signer three", () => {
           it("should have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubAdd(sig[2]))).to.deep.equal([sig[3].address, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[2]))).to.deep.equal([sig[3].address, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
 
         describe("signer four", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubAdd(sig[3]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[3]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
       });
@@ -63,28 +63,28 @@ describe("Subscription.getSubAdd", () => {
         describe("signer one (deployer)", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubAdd(sig[0]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[0]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
 
         describe("signer two", () => {
           it("should have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubAdd(sig[1]))).to.deep.equal([sig[3].address, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[1]))).to.deep.equal([sig[3].address, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
 
         describe("signer three", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubAdd(sig[2]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[2]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
 
         describe("signer four", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubAdd(sig[3]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[3]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
       });
@@ -104,28 +104,28 @@ describe("Subscription.getSubAdd", () => {
         describe("signer one (deployer)", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubAdd(sig[0]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[0]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
 
         describe("signer two", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubAdd(sig[1]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[1]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
 
         describe("signer three", () => {
           it("should have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubAdd(sig[2]))).to.deep.equal([sig[3].address, sig[6].address, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[2]))).to.deep.equal([sig[3].address, sig[6].address, ethers.ZeroAddress]);
           });
         });
 
         describe("signer four", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubAdd(sig[3]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[3]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
       });
@@ -143,28 +143,28 @@ describe("Subscription.getSubAdd", () => {
         describe("signer one (deployer)", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubAdd(sig[0]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[0]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
 
         describe("signer two", () => {
           it("should have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubAdd(sig[1]))).to.deep.equal([sig[3].address, sig[6].address, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[1]))).to.deep.equal([sig[3].address, sig[6].address, ethers.ZeroAddress]);
           });
         });
 
         describe("signer three", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubAdd(sig[2]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[2]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
 
         describe("signer four", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubAdd(sig[3]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[3]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
       });
@@ -185,28 +185,28 @@ describe("Subscription.getSubAdd", () => {
         describe("signer one (deployer)", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubAdd(sig[0]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[0]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
 
         describe("signer two", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubAdd(sig[1]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[1]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
 
         describe("signer three", () => {
           it("should have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubAdd(sig[2]))).to.deep.equal([sig[3].address, sig[6].address, sig[9].address]);
+            expect((await scn.getSubRec(sig[2]))).to.deep.equal([sig[3].address, sig[6].address, sig[9].address]);
           });
         });
 
         describe("signer four", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubAdd(sig[3]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[3]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
       });
@@ -225,28 +225,28 @@ describe("Subscription.getSubAdd", () => {
         describe("signer one (deployer)", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubAdd(sig[0]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[0]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
 
         describe("signer two", () => {
           it("should have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubAdd(sig[1]))).to.deep.equal([sig[3].address, sig[6].address, sig[9].address]);
+            expect((await scn.getSubRec(sig[1]))).to.deep.equal([sig[3].address, sig[6].address, sig[9].address]);
           });
         });
 
         describe("signer three", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubAdd(sig[2]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[2]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
 
         describe("signer four", () => {
           it("should not have valid subscription", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubAdd(sig[3]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getSubRec(sig[3]))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
           });
         });
       });
