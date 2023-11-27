@@ -27,7 +27,7 @@ describe("Subscription.subOne", () => {
           it("should not be able to subscribe with zero address", async () => {
             const { sig, scn } = await loadFixture(setFeeDefSubDef);
             const tnx = scn.connect(sig[2]).subOne(ethers.ZeroAddress, sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
-            await expect(tnx).to.be.revertedWith("subscription address must not be zero");
+            await expect(tnx).to.be.revertedWith("receiver address must not be zero");
           });
         });
 
@@ -139,7 +139,7 @@ describe("Subscription.subOne", () => {
           it("should not be able to subscribe with zero address", async () => {
             const { sig, scn } = await loadFixture(setFee25PSub25F);
             const tnx = scn.connect(sig[2]).subOne(ethers.ZeroAddress, sig[3], 1698793200, { value: ethers.parseUnits("0.025", "ether") })
-            await expect(tnx).to.be.revertedWith("subscription address must not be zero");
+            await expect(tnx).to.be.revertedWith("receiver address must not be zero");
           });
         });
 
