@@ -12,7 +12,17 @@ async function main() {
 
   const [cur, rec] = await pcn.searchRecord(0, fir);
 
-  for (const x of rec) {
+  const srt = [...rec].sort((a, b) => {
+    const sys: number = Number(a.sys) - Number(b.sys);
+
+    if (sys === 0) {
+      return a.mem.localeCompare(b.mem);
+    }
+
+    return sys;
+  });
+
+  for (const x of srt) {
     console.log("  ", Number(x.sys), x.mem, Number(x.acc));
   }
 
