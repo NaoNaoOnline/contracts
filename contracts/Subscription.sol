@@ -66,20 +66,20 @@ contract Subscription is Ownable {
 
     /// @notice getSubRec returns the creator addresses paid for this period.
     /// @notice Returns zero addresses if no subscription was registered ever.
-    /// @param subrecv the user ID of the receiver to search for.
+    /// @param subrcvr the user ID of the receiver to search for.
     /// @return address[] the list of paid creator addresses.
     function getSubRec(
-        uint256 subrecv
+        uint256 subrcvr
     ) public view returns (address[3] memory) {
-        return _subrec[subrecv];
+        return _subrec[subrcvr];
     }
 
     /// @notice getSubUni returns the currently registered subscription period.
     /// @notice Returns 0 if no subscription was registered ever.
-    /// @param subrecv the user ID of the receiver to search for.
+    /// @param subrcvr the user ID of the receiver to search for.
     /// @return uint256 the associated subscription period, e.g. 1696111200.
-    function getSubUni(uint256 subrecv) public view returns (uint256) {
-        return _subunx[subrecv];
+    function getSubUni(uint256 subrcvr) public view returns (uint256) {
+        return _subunx[subrcvr];
     }
 
     ///
@@ -90,21 +90,21 @@ contract Subscription is Ownable {
     /// @notice Subscriptions have to be renewed in advance every month.
     /// @notice Subscribing for a subscription period requires paying a fee.
     /// @notice Fees are paid to creator addresses, minus a service fee.
-    /// @param subrecv the user ID of the receiver, can differ from msg.sender.
+    /// @param subrcvr the user ID of the receiver, can differ from msg.sender.
     /// @param creaone the beneficiary creator address.
     /// @param unixsec the unix timestamp for the subscription period.
     function subOne(
-        uint256 subrecv,
+        uint256 subrcvr,
         address creaone,
         uint256 unixsec
     ) external payable {
         {
             // Verify the given input.
-            require(subrecv != 0, "receiver user ID must not be zero");
+            require(subrcvr != 0, "receiver user ID must not be zero");
             require(creaone != address(0), "creator address must not be zero");
             require(_subamn == msg.value, "subscription amount must match");
 
-            uint256 exi = getSubUni(subrecv);
+            uint256 exi = getSubUni(subrcvr);
             if (exi == 0) {
                 require(unixsec > 1696111200, "unix timestamp must be current");
             } else {
@@ -116,12 +116,12 @@ contract Subscription is Ownable {
             // Track the unix timestamp for this subscription. The map key here
             // tells us who the receiver is and the map value here tells us for
             // which period they subscribed.
-            _subunx[subrecv] = unixsec;
+            _subunx[subrcvr] = unixsec;
 
             // Track the paid creator addresses. The map key here tells us who
             // the receiver is and the map value here tells us which creators
             // they paid.
-            _subrec[subrecv] = [creaone];
+            _subrec[subrcvr] = [creaone];
         }
 
         {
@@ -142,14 +142,14 @@ contract Subscription is Ownable {
     /// @notice Subscribing for a subscription period requires paying a fee.
     /// @notice Fees are paid to creator addresses, minus a service fee.
     /// @notice Creator amounts must add up to 100%, e.g. 75 and 25.
-    /// @param subrecv the user ID of the receiver, can differ from msg.sender.
+    /// @param subrcvr the user ID of the receiver, can differ from msg.sender.
     /// @param creaone the 1st beneficiary creator address.
     /// @param amntone the 1st beneficiary creator amount in percent, e.g. 75.
     /// @param creatwo the 2nd beneficiary creator address.
     /// @param amnttwo the 2nd beneficiary creator amount in percent, e.g. 25.
     /// @param unixsec the unix timestamp for the subscription period.
     function subTwo(
-        uint256 subrecv,
+        uint256 subrcvr,
         address creaone,
         uint256 amntone,
         address creatwo,
@@ -158,7 +158,7 @@ contract Subscription is Ownable {
     ) external payable {
         {
             // Verify the given input.
-            require(subrecv != 0, "receiver user ID must not be zero");
+            require(subrcvr != 0, "receiver user ID must not be zero");
             require(creaone != address(0), "creator address must not be zero");
             require(creatwo != address(0), "creator address must not be zero");
             require(amntone != 0, "creator amount must not be zero");
@@ -169,7 +169,7 @@ contract Subscription is Ownable {
             );
             require(_subamn == msg.value, "subscription amount must match");
 
-            uint256 exi = getSubUni(subrecv);
+            uint256 exi = getSubUni(subrcvr);
             if (exi == 0) {
                 require(unixsec > 1696111200, "unix timestamp must be current");
             } else {
@@ -181,12 +181,12 @@ contract Subscription is Ownable {
             // Track the unix timestamp for this subscription. The map key here
             // tells us who the receiver is and the map value here tells us for
             // which period they subscribed.
-            _subunx[subrecv] = unixsec;
+            _subunx[subrcvr] = unixsec;
 
             // Track the paid creator addresses. The map key here tells us who
             // the receiver is and the map value here tells us which creators
             // they paid.
-            _subrec[subrecv] = [creaone, creatwo];
+            _subrec[subrcvr] = [creaone, creatwo];
         }
 
         {
@@ -210,7 +210,7 @@ contract Subscription is Ownable {
     /// @notice Subscribing for a subscription period requires paying a fee.
     /// @notice Fees are paid to creator addresses, minus a service fee.
     /// @notice Creator amounts must add up to 100%, e.g. 65, 30 and 5.
-    /// @param subrecv the user ID of the receiver, can differ from msg.sender.
+    /// @param subrcvr the user ID of the receiver, can differ from msg.sender.
     /// @param creaone the 1st beneficiary creator address.
     /// @param amntone the 1st beneficiary creator amount in percent, e.g. 65.
     /// @param creatwo the 2nd beneficiary creator address.
@@ -219,7 +219,7 @@ contract Subscription is Ownable {
     /// @param amntthr the 3rd beneficiary creator amount in percent, e.g. 5.
     /// @param unixsec the unix timestamp for the subscription period.
     function subThr(
-        uint256 subrecv,
+        uint256 subrcvr,
         address creaone,
         uint256 amntone,
         address creatwo,
@@ -230,7 +230,7 @@ contract Subscription is Ownable {
     ) external payable {
         {
             // Verify the given input.
-            require(subrecv != 0, "receiver user ID must not be zero");
+            require(subrcvr != 0, "receiver user ID must not be zero");
             require(creaone != address(0), "creator address must not be zero");
             require(creatwo != address(0), "creator address must not be zero");
             require(creathr != address(0), "creator address must not be zero");
@@ -243,7 +243,7 @@ contract Subscription is Ownable {
             );
             require(_subamn == msg.value, "subscription amount must match");
 
-            uint256 exi = getSubUni(subrecv);
+            uint256 exi = getSubUni(subrcvr);
             if (exi == 0) {
                 require(unixsec > 1696111200, "unix timestamp must be current");
             } else {
@@ -255,12 +255,12 @@ contract Subscription is Ownable {
             // Track the unix timestamp for this subscription. The map key here
             // tells us who the receiver is and the map value here tells us for
             // which period they subscribed.
-            _subunx[subrecv] = unixsec;
+            _subunx[subrcvr] = unixsec;
 
             // Track the paid creator addresses. The map key here tells us who
             // the receiver is and the map value here tells us which creators
             // they paid.
-            _subrec[subrecv] = [creaone, creatwo, creathr];
+            _subrec[subrcvr] = [creaone, creatwo, creathr];
         }
 
         {
