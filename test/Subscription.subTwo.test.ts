@@ -114,7 +114,7 @@ describe("Subscription.subTwo", () => {
 
           it("should not be able to subscribe with non-100-sum", async () => {
             const { sig, scn } = await loadFixture(setFeeDefSubDef);
-            const tnx = scn.connect(sig[2]).subTwo(2, sig[3], 10, sig[6], 500, 1698793200, { value: ethers.parseUnits("0.003", "ether") })
+            const tnx = scn.connect(sig[2]).subTwo(2, sig[3], 10, sig[6], 200, 1698793200, { value: ethers.parseUnits("0.003", "ether") })
             await expect(tnx).to.be.revertedWith("creator amount must add up to 100");
           });
 
@@ -317,7 +317,7 @@ describe("Subscription.subTwo", () => {
 
           it("should not be able to subscribe with non-100-sum", async () => {
             const { sig, scn } = await loadFixture(setFee25PSub25F);
-            const tnx = scn.connect(sig[2]).subTwo(2, sig[3], 10, sig[6], 500, 1698793200, { value: ethers.parseUnits("0.025", "ether") })
+            const tnx = scn.connect(sig[2]).subTwo(2, sig[3], 10, sig[6], 200, 1698793200, { value: ethers.parseUnits("0.025", "ether") })
             await expect(tnx).to.be.revertedWith("creator amount must add up to 100");
           });
 

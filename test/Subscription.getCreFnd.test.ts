@@ -2,7 +2,7 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-describe("Subscription.getSubRec", () => {
+describe("Subscription.getCreFnd", () => {
   const deployContract = async () => {
     const sig = await ethers.getSigners();
 
@@ -11,42 +11,42 @@ describe("Subscription.getSubRec", () => {
     return { sig, scn };
   }
 
-  describe("getSubRec", () => {
+  describe("getCreFnd", () => {
     describe("single subscription", () => {
       describe("for yourself", () => {
         const subOneSin = async () => {
           const { sig, scn } = await loadFixture(deployContract);
 
-          await scn.connect(sig[2]).subOne(2, sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
+          await scn.connect(sig[3]).subOne(2, sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
 
           return { sig, scn };
         }
 
         describe("signer one (deployer)", () => {
-          it("should not have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubRec(0))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[0]))).to.equal(0);
           });
         });
 
         describe("signer two", () => {
-          it("should not have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubRec(1))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[1]))).to.equal(0);
           });
         });
 
         describe("signer three", () => {
-          it("should have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubRec(2))).to.deep.equal([sig[3].address, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[2]))).to.equal(0);
           });
         });
 
         describe("signer four", () => {
-          it("should not have valid subscription", async () => {
+          it("should have valid subscription count of 1", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubRec(3))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[3]))).to.equal(1);
           });
         });
       });
@@ -61,30 +61,30 @@ describe("Subscription.getSubRec", () => {
         }
 
         describe("signer one (deployer)", () => {
-          it("should not have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubRec(0))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[0]))).to.equal(0);
           });
         });
 
         describe("signer two", () => {
-          it("should have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubRec(1))).to.deep.equal([sig[3].address, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[1]))).to.equal(0);
           });
         });
 
         describe("signer three", () => {
-          it("should not have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubRec(2))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[2]))).to.equal(0);
           });
         });
 
         describe("signer four", () => {
-          it("should not have valid subscription", async () => {
+          it("should have valid subscription count of 1", async () => {
             const { sig, scn } = await loadFixture(subOneSin);
-            expect((await scn.getSubRec(3))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[3]))).to.equal(1);
           });
         });
       });
@@ -95,37 +95,44 @@ describe("Subscription.getSubRec", () => {
         const subTwoMul = async () => {
           const { sig, scn } = await loadFixture(deployContract);
 
-          await scn.connect(sig[2]).subOne(2, sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
-          await scn.connect(sig[2]).subTwo(2, sig[3], 50, sig[6], 50, 1701385200, { value: ethers.parseUnits("0.003", "ether") })
+          await scn.connect(sig[3]).subOne(2, sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
+          await scn.connect(sig[3]).subTwo(2, sig[3], 50, sig[6], 50, 1701385200, { value: ethers.parseUnits("0.003", "ether") })
 
           return { sig, scn };
         }
 
         describe("signer one (deployer)", () => {
-          it("should not have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubRec(0))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[0]))).to.equal(0);
           });
         });
 
         describe("signer two", () => {
-          it("should not have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubRec(1))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[1]))).to.equal(0);
           });
         });
 
         describe("signer three", () => {
-          it("should have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubRec(2))).to.deep.equal([sig[3].address, sig[6].address, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[2]))).to.equal(0);
           });
         });
 
         describe("signer four", () => {
-          it("should not have valid subscription", async () => {
+          it("should have valid subscription count of 2", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubRec(3))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[3]))).to.equal(2);
+          });
+        });
+
+        describe("signer seven", () => {
+          it("should have valid subscription count of 1", async () => {
+            const { sig, scn } = await loadFixture(subTwoMul);
+            expect((await scn.getCreFnd(sig[6]))).to.equal(1);
           });
         });
       });
@@ -141,30 +148,37 @@ describe("Subscription.getSubRec", () => {
         }
 
         describe("signer one (deployer)", () => {
-          it("should not have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubRec(0))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[0]))).to.equal(0);
           });
         });
 
         describe("signer two", () => {
-          it("should have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubRec(1))).to.deep.equal([sig[3].address, sig[6].address, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[1]))).to.equal(0);
           });
         });
 
         describe("signer three", () => {
-          it("should not have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubRec(2))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[2]))).to.equal(0);
           });
         });
 
         describe("signer four", () => {
-          it("should not have valid subscription", async () => {
+          it("should have valid subscription count of 2", async () => {
             const { sig, scn } = await loadFixture(subTwoMul);
-            expect((await scn.getSubRec(3))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[3]))).to.equal(2);
+          });
+        });
+
+        describe("signer seven", () => {
+          it("should have valid subscription count of 1", async () => {
+            const { sig, scn } = await loadFixture(subTwoMul);
+            expect((await scn.getCreFnd(sig[6]))).to.equal(1);
           });
         });
       });
@@ -175,38 +189,52 @@ describe("Subscription.getSubRec", () => {
         const subThrMul = async () => {
           const { sig, scn } = await loadFixture(deployContract);
 
-          await scn.connect(sig[2]).subOne(2, sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
-          await scn.connect(sig[2]).subTwo(2, sig[3], 50, sig[6], 50, 1701385200, { value: ethers.parseUnits("0.003", "ether") })
-          await scn.connect(sig[2]).subThr(2, sig[3], 20, sig[6], 50, sig[9], 30, 1704063600, { value: ethers.parseUnits("0.003", "ether") })
+          await scn.connect(sig[3]).subOne(2, sig[3], 1698793200, { value: ethers.parseUnits("0.003", "ether") })
+          await scn.connect(sig[3]).subTwo(2, sig[3], 50, sig[6], 50, 1701385200, { value: ethers.parseUnits("0.003", "ether") })
+          await scn.connect(sig[3]).subThr(2, sig[3], 20, sig[6], 50, sig[9], 30, 1704063600, { value: ethers.parseUnits("0.003", "ether") })
 
           return { sig, scn };
         }
 
         describe("signer one (deployer)", () => {
-          it("should not have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubRec(0))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[0]))).to.equal(0);
           });
         });
 
         describe("signer two", () => {
-          it("should not have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubRec(1))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[1]))).to.equal(0);
           });
         });
 
         describe("signer three", () => {
-          it("should have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubRec(2))).to.deep.equal([sig[3].address, sig[6].address, sig[9].address]);
+            expect((await scn.getCreFnd(sig[2]))).to.equal(0);
           });
         });
 
         describe("signer four", () => {
-          it("should not have valid subscription", async () => {
+          it("should have valid subscription count of 3", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubRec(3))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[3]))).to.equal(3);
+          });
+        });
+
+        describe("signer seven", () => {
+          it("should have valid subscription count of 2", async () => {
+            const { sig, scn } = await loadFixture(subThrMul);
+            expect((await scn.getCreFnd(sig[6]))).to.equal(2);
+          });
+        });
+
+        describe("signer ten", () => {
+          it("should have valid subscription count of 1", async () => {
+            const { sig, scn } = await loadFixture(subThrMul);
+            expect((await scn.getCreFnd(sig[9]))).to.equal(1);
           });
         });
       });
@@ -223,30 +251,44 @@ describe("Subscription.getSubRec", () => {
         }
 
         describe("signer one (deployer)", () => {
-          it("should not have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubRec(0))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[0]))).to.equal(0);
           });
         });
 
         describe("signer two", () => {
-          it("should have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubRec(1))).to.deep.equal([sig[3].address, sig[6].address, sig[9].address]);
+            expect((await scn.getCreFnd(sig[1]))).to.equal(0);
           });
         });
 
         describe("signer three", () => {
-          it("should not have valid subscription", async () => {
+          it("should not have valid subscription count", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubRec(2))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[2]))).to.equal(0);
           });
         });
 
         describe("signer four", () => {
-          it("should not have valid subscription", async () => {
+          it("should have valid subscription count of 3", async () => {
             const { sig, scn } = await loadFixture(subThrMul);
-            expect((await scn.getSubRec(3))).to.deep.equal([ethers.ZeroAddress, ethers.ZeroAddress, ethers.ZeroAddress]);
+            expect((await scn.getCreFnd(sig[3]))).to.equal(3);
+          });
+        });
+
+        describe("signer seven", () => {
+          it("should have valid subscription count of 2", async () => {
+            const { sig, scn } = await loadFixture(subThrMul);
+            expect((await scn.getCreFnd(sig[6]))).to.equal(2);
+          });
+        });
+
+        describe("signer ten", () => {
+          it("should have valid subscription count of 1", async () => {
+            const { sig, scn } = await loadFixture(subThrMul);
+            expect((await scn.getCreFnd(sig[9]))).to.equal(1);
           });
         });
       });
