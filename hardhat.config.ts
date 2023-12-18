@@ -19,7 +19,7 @@ const config: HardhatUserConfig = {
   networks: {
     sepolia: {
       url: "https://eth-sepolia.g.alchemy.com/v2/[REDACTED]",
-      accounts: [SEPOLIA_PRIVATE_KEY]
+      // accounts: [SEPOLIA_PRIVATE_KEY]
     }
   },
   solidity: {
