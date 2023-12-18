@@ -1,7 +1,9 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const cnt = await ethers.deployContract("Subscription", ["0x6591C0Ee99D48b43a2c84Da284DB7A526C2dAfE0"]);
+  const sig = await ethers.getSigners();
+
+  const cnt = await ethers.deployContract("Subscription", [sig[0].address]);
 
   await cnt.waitForDeployment();
 
